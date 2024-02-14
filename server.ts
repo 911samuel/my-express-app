@@ -1,30 +1,26 @@
 import express, { Request, Response } from 'express';
-import { MongoClient, MongoClientOptions } from 'mongodb';
+import mongoose from 'mongoose';
+import morgan from 'morgan';
+import bodyParser from 'body-parser';
+
+mongoose.connect('mongodb://localhost:27017/test');
+const db = mongoose.connection;
+
+db.on('error', (err) => {
+  console.log(err);
+});
+
+db.once('open', () => {
+  console.log('Connected to MongoDB');
+});
 
 const app = express();
+app.use(morgan('dev')); 
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(express.json());
+const port: number = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
-const uri: string = 'mongodb://localhost:27017/mydatabase';
-
-const clientOptions: MongoClientOptions = {
-};
-
-MongoClient.connect(uri, clientOptions)
-  .then(client => {
-    console.log('Connected to MongoDB');
-    const db = client.db('mydatabase');
-
-    app.get('/data', async (req: Request, res: Response) => {
-      const data = await db.collection('mycollection').find().toArray();
-      res.json(data);
-    });
-  })
-  .catch(err => {
-    console.error('Error connecting to MongoDB', err);
-  });
-
-const PORT: number = process.env.PORT ? parseInt(process.env.PORT) : 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+app.listen(port, () => {
+  console.log(`Server is listening on ${port}`);
 });
