@@ -22,15 +22,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose_1 = __importStar(require("mongoose"));
-const brandSchema = new mongoose_1.Schema({
-    name: { type: String, required: true },
-    destination: { type: String },
-    email: { type: String, required: true },
-    phoneNumber: { type: Number },
-    age: { type: Number },
-    description: { type: String }
-}, { timestamps: true });
-const Brand = mongoose_1.default.model('Brand', brandSchema);
-exports.default = Brand;
+const express_1 = __importDefault(require("express"));
+const BrandController = __importStar(require("../controllers/brandController"));
+const router = express_1.default.Router();
+router.get('/', BrandController.index);
+router.get('/show/:id', BrandController.show);
+router.post('/store', BrandController.store);
+router.put('/update/:id', BrandController.update);
+router.delete('/deleteBrand/:id', BrandController.deleteBrand);
+exports.default = router;

@@ -10,27 +10,31 @@ interface RequestWithBrand extends Request {
 }
 
 const index = (req: RequestWithBrands, res: Response, next: NextFunction) => {
-    Brand.find(function (err: Error, brands: IBrand[]) {
-        if (err) return next(err);
-        req.brands = brands;
-        next();
-    });
+    Brand.find()
+        .then((response: IBrand[]) => {
+            res.json({ response });
+        })
+        .catch((error: Error) => {
+            res.status(500).json({ message: "An error occurred" });
+        });
 };
 
 const show = (req: RequestWithBrand, res: Response, next: NextFunction) => {
-    let id = req.body.id || req.params.id;
-    Brand.findById(id, function (err: Error, brand: IBrand | null) {
-        if (err) return next(err);
-        if (!brand) {
-            return res.status(404).json({ message: 'Brand not found' });
-        }
-        req.brand = brand;
-        next();
-    });
+    const id = req.params.id;
+    Brand.findById(id)
+        .then((brand: IBrand | null) => {
+            if (!brand) {
+                return res.status(404).json({ message: 'Brand not found' });
+            }
+            res.json({ brand });
+        })
+        .catch((error: Error) => {
+            next(error);
+        });
 };
 
 const store = (req: Request, res: Response, next: NextFunction) => {
-    let brand = new Brand({
+    const brand = new Brand({
         name: req.body.name,
         destination: req.body.destination,
         email: req.body.email,
@@ -39,18 +43,17 @@ const store = (req: Request, res: Response, next: NextFunction) => {
         description: req.body.description
     });
     brand.save()
-    .then((data: any) => {
-        res.status(201).json(data);
-    })
-    .catch((error: Error) => {
-        res.status(500).json({ error: "Error on save the brand"});
-    });
+        .then((savedBrand: IBrand) => {
+            res.status(201).json({ message: `The brand was added successfully.`, brand: savedBrand });
+        })
+        .catch((error: Error) => {
+            res.status(500).json({ error: "Error on save the brand" });
+        });
 };
 
-
 const update = (req: Request, res: Response, next: NextFunction) => {
-    let brandId = req.body.brandId;
-    let updateData = {
+    const brandId = req.params.id;
+    const updateData = {
         name: req.body.name,
         destination: req.body.destination,
         email: req.body.email,
@@ -59,24 +62,29 @@ const update = (req: Request, res: Response, next: NextFunction) => {
         description: req.body.description
     };
     Brand.findByIdAndUpdate(brandId, { $set: updateData }, { new: true })
-        .then(data => {
-            if (!data) {
+        .then((updatedBrand: IBrand | null) => {
+            if (!updatedBrand) {
                 return res.status(404).json({ message: 'Brand not found.' });
-            } else {
-                res.status(200).json(data);
             }
-        }).catch(next);
+            res.status(200).json({ message: `The brand was updated successfully.`, brand: updatedBrand });
+        })
+        .catch((error: Error) => {
+            next(error);
+        });
 };
 
 const deleteBrand = (req: Request, res: Response, next: NextFunction) => {
-    let brandId = req.params.id;
-    Brand.findByIdAndDelete(brandId, function (err: Error | null, brandDeleted: IBrand | null) {
-        if (err) return next(err);
-        if (!brandDeleted) {
-            return res.status(404).json({ message: 'Brand not found' });
-        }
-        res.status(200).json({ message: 'Brand deleted successfully' });
-    });
+    const brandId = req.params.id;
+    Brand.findByIdAndDelete(brandId)
+        .then((deletedBrand: IBrand | null) => {
+            if (!deletedBrand) {
+                return res.status(404).json({ message: 'Brand not found.' });
+            }
+            res.status(200).json({ message: `The brand was deleted successfully.` });
+        })
+        .catch((error: Error) => {
+            next(error);
+        });
 };
 
 export { index, show, store, update, deleteBrand };

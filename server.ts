@@ -1,13 +1,15 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 import morgan from 'morgan';
 import bodyParser from 'body-parser';
+
+import BrandRoute from './scr/routes/brand';
 
 mongoose.connect('mongodb://localhost:27017/test');
 const db = mongoose.connection;
 
 db.on('error', (err) => {
-  console.log(err);
+  console.error('MongoDB connection error:', err);
 });
 
 db.once('open', () => {
@@ -15,9 +17,17 @@ db.once('open', () => {
 });
 
 const app = express();
-app.use(morgan('dev')); 
+
+app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use('/api/brand', BrandRoute);
+
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error(err.stack);
+  res.status(500).send('Something went wrong!');
+});
 
 const port: number = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
