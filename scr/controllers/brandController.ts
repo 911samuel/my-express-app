@@ -42,6 +42,11 @@ const store = (req: Request, res: Response, next: NextFunction) => {
         age: req.body.age,
         description: req.body.description
     });
+
+    if (req.file) {
+        brand.avatar = req.file.path;
+    }
+
     brand.save()
         .then((savedBrand: IBrand) => {
             res.status(201).json({ message: `The brand was added successfully.`, brand: savedBrand });

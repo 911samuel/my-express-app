@@ -30,7 +30,8 @@ const brandSchema = new mongoose_1.Schema({
     email: { type: String, required: true },
     phoneNumber: { type: Number },
     age: { type: Number },
-    description: { type: String }
+    description: { type: String },
+    avatar: { type: String }
 }, { timestamps: true });
 const Brand = mongoose_1.default.model('Brand', brandSchema);
 exports.default = Brand;

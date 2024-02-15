@@ -7,6 +7,7 @@ const express_1 = __importDefault(require("express"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const morgan_1 = __importDefault(require("morgan"));
 const body_parser_1 = __importDefault(require("body-parser"));
+const path_1 = __importDefault(require("path"));
 const brand_1 = __importDefault(require("./scr/routes/brand"));
 mongoose_1.default.connect('mongodb://localhost:27017/test');
 const db = mongoose_1.default.connection;
@@ -17,9 +18,11 @@ db.once('open', () => {
     console.log('Connected to MongoDB');
 });
 const app = (0, express_1.default)();
+const uploadsDirectory = path_1.default.join(__dirname, 'upload');
 app.use((0, morgan_1.default)('dev'));
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: true }));
+app.use('/upload', express_1.default.static(uploadsDirectory));
 app.use('/api/brand', brand_1.default);
 app.use((err, req, res, next) => {
     console.error(err.stack);

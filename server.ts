@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 import morgan from 'morgan';
 import bodyParser from 'body-parser';
+import path from 'path';
 
 import BrandRoute from './scr/routes/brand';
 
@@ -17,10 +18,12 @@ db.once('open', () => {
 });
 
 const app = express();
+const uploadsDirectory = path.join(__dirname, 'upload');
 
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use('/upload', express.static(uploadsDirectory));
 
 app.use('/api/brand', BrandRoute);
 

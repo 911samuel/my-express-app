@@ -7,6 +7,7 @@ export interface IBrand extends Document {
     phoneNumber?: number;
     age?: number;
     description?: string;
+    avatar?: string;
 }
 
 const brandSchema: Schema = new Schema({
@@ -15,7 +16,8 @@ const brandSchema: Schema = new Schema({
     email: { type: String, required: true },
     phoneNumber: { type: Number },
     age: { type: Number },
-    description: { type: String }
+    description: { type: String },
+    avatar: { type: String }
 }, { timestamps: true });
 
 const Brand = mongoose.model<IBrand>('Brand', brandSchema);

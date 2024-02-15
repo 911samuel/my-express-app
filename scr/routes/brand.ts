@@ -1,12 +1,12 @@
-import express from 'express';
-import { Router } from 'express';
+import express, { Router } from 'express';
 import * as BrandController from '../controllers/brandController';
+import upload from '../middleware/upload'; 
 
-const router: Router = express.Router();
+const router: Router = Router(); 
 
 router.get('/', BrandController.index);
 router.get('/show/:id', BrandController.show);
-router.post('/store', BrandController.store);
+router.post('/store', upload.single('avatar'), BrandController.store);
 router.put('/update/:id', BrandController.update);
 router.delete('/deleteBrand/:id', BrandController.deleteBrand);
 

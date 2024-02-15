@@ -26,12 +26,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
+const express_1 = require("express");
 const BrandController = __importStar(require("../controllers/brandController"));
-const router = express_1.default.Router();
+const upload_1 = __importDefault(require("../middleware/upload"));
+const router = (0, express_1.Router)();
 router.get('/', BrandController.index);
 router.get('/show/:id', BrandController.show);
-router.post('/store', BrandController.store);
+router.post('/store', upload_1.default.single('avatar'), BrandController.store);
 router.put('/update/:id', BrandController.update);
 router.delete('/deleteBrand/:id', BrandController.deleteBrand);
 exports.default = router;
