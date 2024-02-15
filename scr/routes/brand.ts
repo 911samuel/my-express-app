@@ -1,6 +1,6 @@
 import express, { Router } from 'express';
 import * as BrandController from '../controllers/brandController';
-import upload from '../middleware/upload'; 
+import upload from '../utils/upload'; 
 
 const router: Router = Router(); 
 

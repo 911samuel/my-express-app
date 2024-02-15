@@ -22,7 +22,7 @@ const show = (req, res, next) => {
         if (!brand) {
             return res.status(404).json({ message: 'Brand not found' });
         }
-        res.json({ brand });
+        return res.json({ brand });
     })
         .catch((error) => {
         next(error);
@@ -65,7 +65,7 @@ const update = (req, res, next) => {
         if (!updatedBrand) {
             return res.status(404).json({ message: 'Brand not found.' });
         }
-        res.status(200).json({ message: `The brand was updated successfully.`, brand: updatedBrand });
+        return res.status(200).json({ message: `The brand was updated successfully.`, brand: updatedBrand });
     })
         .catch((error) => {
         next(error);
@@ -79,7 +79,7 @@ const deleteBrand = (req, res, next) => {
         if (!deletedBrand) {
             return res.status(404).json({ message: 'Brand not found.' });
         }
-        res.status(200).json({ message: `The brand was deleted successfully.` });
+        return res.status(200).json({ message: `The brand was deleted successfully.` });
     })
         .catch((error) => {
         next(error);

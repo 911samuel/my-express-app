@@ -26,7 +26,7 @@ const show = (req: RequestWithBrand, res: Response, next: NextFunction) => {
             if (!brand) {
                 return res.status(404).json({ message: 'Brand not found' });
             }
-            res.json({ brand });
+            return res.json({ brand });
         })
         .catch((error: Error) => {
             next(error);
@@ -71,7 +71,7 @@ const update = (req: Request, res: Response, next: NextFunction) => {
             if (!updatedBrand) {
                 return res.status(404).json({ message: 'Brand not found.' });
             }
-            res.status(200).json({ message: `The brand was updated successfully.`, brand: updatedBrand });
+            return res.status(200).json({ message: `The brand was updated successfully.`, brand: updatedBrand });
         })
         .catch((error: Error) => {
             next(error);
@@ -85,7 +85,7 @@ const deleteBrand = (req: Request, res: Response, next: NextFunction) => {
             if (!deletedBrand) {
                 return res.status(404).json({ message: 'Brand not found.' });
             }
-            res.status(200).json({ message: `The brand was deleted successfully.` });
+            return res.status(200).json({ message: `The brand was deleted successfully.` });
         })
         .catch((error: Error) => {
             next(error);
