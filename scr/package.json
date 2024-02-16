@@ -6,7 +6,7 @@
   "scripts": {
     "dev:watch": "nodemon",
     "dev": "npm run clean && npm run build && npm run dev:watch",
-    "start": "nodemon dest/index.js",
+    "start": "nodemon dest/server.js",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint .",

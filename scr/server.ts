@@ -4,7 +4,7 @@ import morgan from 'morgan';
 import bodyParser from 'body-parser';
 import path from 'path';
 
-import BrandRoute from './scr/routes/brand';
+import BrandRoute from './routes/brand';
 
 mongoose.connect('mongodb://localhost:27017/test')
   .then(() => console.log('Connected to MongoDB'))
