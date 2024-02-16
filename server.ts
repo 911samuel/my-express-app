@@ -17,9 +17,13 @@ app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use('/uploads', express.static(uploadsDirectory));
+app.use('./scr/uploads', express.static(uploadsDirectory));
 
 app.use('/api/brand', BrandRoute);
+
+app.get('/', (req: Request, res: Response) => {
+  res.send('Hello, World!');
+});
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);

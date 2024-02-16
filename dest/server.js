@@ -17,8 +17,11 @@ const uploadsDirectory = path_1.default.join(__dirname, 'uploads');
 app.use((0, morgan_1.default)('dev'));
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: true }));
-app.use('/uploads', express_1.default.static(uploadsDirectory));
+app.use('./scr/uploads', express_1.default.static(uploadsDirectory));
 app.use('/api/brand', brand_1.default);
+app.get('/', (req, res) => {
+    res.send('Hello, World!');
+});
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send(`Something went wrong! Error: ${err.message}`);
