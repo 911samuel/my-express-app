@@ -5,20 +5,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const path_1 = __importDefault(require("path"));
 const multer_1 = __importDefault(require("multer"));
+const fs_1 = __importDefault(require("fs"));
+const uploadDir = './scr/uploads';
+if (!fs_1.default.existsSync(uploadDir)) {
+    fs_1.default.mkdirSync(uploadDir);
+}
 const storage = multer_1.default.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'upload/');
+        cb(null, uploadDir);
     },
     filename: function (req, file, cb) {
         let ext = path_1.default.extname(file.originalname);
-        cb(null, file.fieldname + '-' + Date.now + ext);
+        cb(null, Date.now() + ext);
     }
 });
 const upload = (0, multer_1.default)({
     storage: storage,
     fileFilter: function (req, file, callback) {
-        if (file.mimetype === 'image/jpeg' ||
-            file.mimetype === 'image/png') {
+        if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
             callback(null, true);
         }
         else {

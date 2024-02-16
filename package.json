@@ -4,9 +4,15 @@
   "description": "my brand backend implementation",
   "main": "server.js",
   "scripts": {
+    "dev:watch": "nodemon",
+    "dev": "npm run clean && npm run build && npm run dev:watch",
+    "start": "nodemon dest/index.js",
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "lint": "eslint .",
+    "clean": "rm -rf dist"
   },
+  
   "keywords": [],
   "author": "abayizera samuel",
   "license": "ISC",
