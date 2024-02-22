@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import Brand, { IBrand } from "../testing/brand";
+import Brand, { IBrand } from "../models/brand";
 import { validationResult } from "express-validator";
 
 interface RequestWithBrands extends Request {

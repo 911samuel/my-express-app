@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteBrand = exports.update = exports.store = exports.show = exports.index = void 0;
-const brand_1 = __importDefault(require("../testing/brand"));
+const brand_1 = __importDefault(require("../models/brand"));
 const express_validator_1 = require("express-validator");
 const index = async (req, res, next) => {
     try {

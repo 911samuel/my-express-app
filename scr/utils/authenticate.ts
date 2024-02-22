@@ -13,7 +13,7 @@ const authenticate = (req: Request, res: Response, next: NextFunction) => {
             return res.status(401).json({ error: 'Missing Authorization Header' });
         }
 
-        const decodedToken = jwt.verify(token, 'I0H1A9G2sam');
+        const decodedToken = jwt.verify(token, process.env.SECRET || 'secret');
         (req as AuthenticatedRequest).user = decodedToken;
         next();
     } catch (err) {

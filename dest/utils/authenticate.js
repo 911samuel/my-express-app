@@ -11,7 +11,7 @@ const authenticate = (req, res, next) => {
         if (!token) {
             return res.status(401).json({ error: 'Missing Authorization Header' });
         }
-        const decodedToken = jsonwebtoken_1.default.verify(token, 'I0H1A9G2sam');
+        const decodedToken = jsonwebtoken_1.default.verify(token, process.env.SECRET || 'secret');
         req.user = decodedToken;
         next();
     }
