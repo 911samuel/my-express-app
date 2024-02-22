@@ -3,7 +3,7 @@ import multer, { StorageEngine } from 'multer';
 import { Request, Express } from 'express';
 import fs from 'fs';
 
-const uploadDir = './scr/';
+const uploadDir = './uploads/'; 
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir);
 }

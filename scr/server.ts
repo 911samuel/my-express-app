@@ -1,28 +1,36 @@
-import express, { Request, Response, NextFunction } from 'express';
-import mongoose from 'mongoose';
-import morgan from 'morgan';
-import bodyParser from 'body-parser';
-import path from 'path';
+import express, { Request, Response, NextFunction } from "express";
+import mongoose from "mongoose";
+import morgan from "morgan";
+import bodyParser from "body-parser";
+import path from "path";
+import fs from 'fs';
 
-import BrandRoute from './routes/brand';
+import BrandRoute from "./routes/brand";
+import UserRoute from "./routes/auth";
 
-mongoose.connect('mongodb://localhost:27017/test')
-  .then(() => console.log('Connected to MongoDB'))
-  .catch((err) => console.error('MongoDB connection error:', err));
+mongoose
+  .connect("mongodb://localhost:27017/test")
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => console.error("MongoDB connection error:", err));
 
 const app = express();
-const uploadsDirectory = path.join(__dirname, 'uploads');
+const uploadDir = './uploads'; 
 
-app.use(morgan('dev'));
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+}
+
+app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use('./scr/uploads', express.static(uploadsDirectory));
+app.use('./scr/uploads', express.static(uploadDir));
 
-app.use('/api/brand', BrandRoute);
+app.use("/api/brand", BrandRoute);
+app.use("/api", UserRoute);
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Hello, World!');
+app.get("/", (req: Request, res: Response) => {
+  res.send("Hello, World!");
 });
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
@@ -36,10 +44,10 @@ const server = app.listen(port, () => {
   console.log(`Server is listening on ${port}`);
 });
 
-process.on('SIGINT', () => {
-  console.log('Server shutting down...');
+process.on("SIGINT", () => {
+  console.log("Server shutting down...");
   server.close(() => {
-    console.log('Server stopped');
+    console.log("Server stopped");
     process.exit(0);
   });
 });

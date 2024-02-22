@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import Brand, { IBrand } from "../testing/brand";
+import { validationResult } from "express-validator";
 
 interface RequestWithBrands extends Request {
   brands?: IBrand[];
@@ -40,39 +41,40 @@ const show = async (
 };
 
 const store = async (req: Request, res: Response, next: NextFunction) => {
-  const { name, destination, email, phoneNumber, age, description } = req.body;
-  if (!name || !email) {
-    return res.status(400).json({ message: "Name and email are required" });
+  const { title, author, category, description } = req.body;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
   }
 
   try {
     const brand = new Brand({
-      name,
-      destination,
-      email,
-      phoneNumber,
-      age,
+      title,
+      author,
+      category,
       description,
     });
-    if (req.file) {
-      brand.avatar = req.file.path;
-    }
     const savedBrand = await brand.save();
     res
       .status(201)
-      .json({ message: "The brand was added successfully", brand: savedBrand });
+      .json({ message: "The brand was added successfully"});
   } catch (error) {
     res.status(500).json({ error: "Error on save the brand" });
   }
 };
 
 const update = async (req: Request, res: Response, next: NextFunction) => {
-  const { name, destination, email, phoneNumber, age, description } = req.body;
+
+  const { title, author, category, description } = req.body;
   const brandId = req.params.id;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
   try {
     const updatedBrand = await Brand.findByIdAndUpdate(
       brandId,
-      { $set: { name, destination, email, phoneNumber, age, description } },
+      { $set: { title, author, category, description } },
       { new: true }
     );
     if (!updatedBrand) {

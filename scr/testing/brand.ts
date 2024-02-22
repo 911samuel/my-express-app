@@ -1,21 +1,17 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IBrand extends Document {
-    name: string;
-    destination?: string;
-    email: string;
-    phoneNumber?: number;
-    age?: number;
+    title: string;
+    author: string;
+    category: string;
     description?: string;
     avatar?: string;
 }
 
 const brandSchema: Schema = new Schema({
-    name: { type: String, required: true },
-    destination: { type: String },
-    email: { type: String, required: true },
-    phoneNumber: { type: Number },
-    age: { type: Number },
+    title: { type: String, required: true },
+    author: { type: String },
+    category: { type: String},
     description: { type: String },
     avatar: { type: String }
 }, { timestamps: true });
