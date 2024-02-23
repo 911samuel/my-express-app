@@ -1,15 +1,16 @@
 import express, { Router } from 'express';
 import * as BrandController from '../controllers/brandController';
-import upload from '../utils/upload'; 
-import authenticate from '../utils/authenticate';
-import { storeValidationRules, updateValidationRules } from '../utils/validation';
+import upload from '../middlewares/upload'; 
+import authenticate from '../middlewares/authenticate';
+import { storeValidationRules, updateValidationRules } from '../middlewares/validation';
+import isAdmin from "../middlewares/isAdmin";
 
 const router: Router = Router(); 
 
-router.get('/',authenticate, BrandController.index);
-router.get('/show/:id',authenticate, BrandController.show);
-router.post('/store', authenticate,  storeValidationRules, upload.single('avatar'), BrandController.store);
-router.put('/update/:id', updateValidationRules, BrandController.update);
-router.delete('/deleteBrand/:id', BrandController.deleteBrand);
+router.get('/',authenticate, isAdmin, BrandController.index);
+router.get('/show/:id',authenticate, isAdmin, BrandController.show);
+router.post('/store',authenticate, isAdmin, storeValidationRules, upload.single('avatar'), BrandController.store);
+router.put('/update/:id', authenticate, isAdmin, updateValidationRules, BrandController.update);
+router.delete('/deleteBrand/:id',authenticate, authenticate, BrandController.deleteBrand);
 
 export default router;

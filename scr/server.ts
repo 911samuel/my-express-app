@@ -7,6 +7,7 @@ import fs from 'fs';
 
 import BrandRoute from "./routes/brand";
 import UserRoute from "./routes/auth";
+import commentRoute from "./routes/commentsRoutes";
 
 mongoose
   .connect("mongodb://localhost:27017/test")
@@ -19,15 +20,11 @@ app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const uploadDir = './scr/uploads/'; 
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir);
-}
-
 app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use("/api/brand", BrandRoute);
 app.use("/api", UserRoute);
+app.use("/api/comment", commentRoute);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello, World!");

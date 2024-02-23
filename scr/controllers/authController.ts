@@ -1,9 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
+import { validationResult } from 'express-validator';
 import User, { IUser } from '../models/user';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
     try {
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
         
@@ -12,6 +18,7 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
             lastname: req.body.lastname,
             email: req.body.email,
             password: hashedPassword,
+            role: req.body.role,
             profilePicture: req.body.profilePicture
         });
 
@@ -28,14 +35,19 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 const login =  async (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
     try {
         const user = await User.findOne({ email: req.body.email });
 
-        if (!user) return res.status(401).json('No user with that email found');
+        if (!user) return res.status(401).json({ message: 'No user with that email found' });
 
         const isValidPassword = await bcrypt.compare(req.body.password, user.password);
 
-        if(!isValidPassword) return res.status(401).json('Invalid Password');
+        if(!isValidPassword) return res.status(401).json({ message: 'Invalid Password' });
 
         const token = jwt.sign({ _id: user._id}, process.env.SECRET || 'secret', {expiresIn: "1d"});
 

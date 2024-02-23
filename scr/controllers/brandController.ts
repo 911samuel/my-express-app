@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import Brand, { IBrand } from "../models/brand";
 import { validationResult } from "express-validator";
+import isAdmin from "../middlewares/isAdmin"; 
 
 interface RequestWithBrands extends Request {
   brands?: IBrand[];
@@ -64,7 +65,6 @@ const store = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 const update = async (req: Request, res: Response, next: NextFunction) => {
-
   const { title, author, category, description } = req.body;
   const brandId = req.params.id;
   const errors = validationResult(req);

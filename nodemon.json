@@ -1,0 +1,8 @@
+{
+    "watch": ["scr"],
+    "ext": "ts",
+    "exec": "ts-node scr/server.ts",
+    "ignore": ["node_modules"],
+    "delay": 1000
+  }
+  
