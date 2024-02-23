@@ -14,17 +14,17 @@ mongoose
   .catch((err) => console.error("MongoDB connection error:", err));
 
 const app = express();
-const uploadDir = './uploads'; 
-
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir);
-}
 
 app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use('./scr/uploads', express.static(uploadDir));
+const uploadDir = './scr/uploads/'; 
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+}
+
+app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use("/api/brand", BrandRoute);
 app.use("/api", UserRoute);
