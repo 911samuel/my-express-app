@@ -12,5 +12,6 @@ router.get('/show/:id',authenticate, isAdmin, BrandController.show);
 router.post('/store',authenticate, isAdmin, storeValidationRules, upload.single('avatar'), BrandController.store);
 router.put('/update/:id', authenticate, isAdmin, updateValidationRules, BrandController.update);
 router.delete('/deleteBrand/:id',authenticate, authenticate, BrandController.deleteBrand);
+router.delete('/deleteAll', authenticate, isAdmin, BrandController.deleteAll);
 
 export default router;

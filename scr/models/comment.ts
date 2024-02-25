@@ -13,12 +13,12 @@ const commentSchema: Schema = new Schema({
     },
     author: {
         type: Schema.Types.ObjectId,
-        ref: 'User', 
+        ref: 'user', 
         required: true
     },
     blog_id: {
         type: Schema.Types.ObjectId,
-        ref: 'BlogPost', 
+        ref: 'brand', 
         required: true
     }
 }, { timestamps: true });

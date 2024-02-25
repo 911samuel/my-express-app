@@ -3,7 +3,8 @@ import mongoose from "mongoose";
 import morgan from "morgan";
 import bodyParser from "body-parser";
 import path from "path";
-import fs from 'fs';
+
+require('dotenv').config();
 
 import BrandRoute from "./routes/brand";
 import UserRoute from "./routes/auth";
@@ -24,7 +25,7 @@ app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use("/api/brand", BrandRoute);
 app.use("/api", UserRoute);
-app.use("/api/comment", commentRoute);
+app.use("/api", commentRoute);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello, World!");
@@ -48,3 +49,5 @@ process.on("SIGINT", () => {
     process.exit(0);
   });
 });
+
+export  default server;

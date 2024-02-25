@@ -1,8 +1,9 @@
-import express, { Router } from 'express';
-import commentControllers from '../controllers/commentController'; 
+import express from 'express';
+import commentController from '../controllers/commentController';
+import isUser from '../middlewares/isUser';
 
-const router: Router = Router(); 
+const router = express.Router();
 
-router.post('/comment', commentControllers.createComment);
+router.post('/comments/:id', isUser, commentController.addComment);
 
 export default router;

@@ -15,7 +15,7 @@ const registerValidationRules = [
   body('lastname').notEmpty().withMessage('Last name is required'),
   body('email').isEmail().withMessage('Invalid email address'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
-  body('profilePicture').optional().isURL().withMessage('Profile picture must be a valid URL'),
+  body('avatar').optional().isURL().withMessage('Profile picture must be a valid URL'),
 ];
 
 const loginValidationRules = [

@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import Brand, { IBrand } from "../models/brand";
 import { validationResult } from "express-validator";
-import isAdmin from "../middlewares/isAdmin"; 
 
 interface RequestWithBrands extends Request {
   brands?: IBrand[];
@@ -104,4 +103,13 @@ const deleteBrand = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export { index, show, store, update, deleteBrand };
+const deleteAll = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await Brand.deleteMany({});
+    res.status(200).json({ message: `All brands were deleted successfully.` });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { index, show, store, update, deleteBrand, deleteAll };
