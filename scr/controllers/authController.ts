@@ -31,10 +31,11 @@ const authController: AuthController = {
                 avatar
             });
 
-            const savedUser = await newUser.save();
-            console.log(`New user created: ${savedUser}`);
+            const user = await newUser.save();
+            
+            const token = jwt.sign({ _id: user._id }, process.env.LOGIN_SECRET as string, { expiresIn: '1d' });
 
-            res.status(200).json({ user: savedUser });
+            res.status(200).json({ user: user });
         } catch (error) {
             console.error("Error in Register", error);
             next(error);
@@ -61,7 +62,7 @@ const authController: AuthController = {
                 return res.status(401).json({ message: 'Invalid Password' });
             }
 
-            const token = jwt.sign({ _id: user._id }, process.env.LOGIN_SECRET!, { expiresIn: '1d' });
+            const token = jwt.sign({ _id: user._id }, process.env.LOGIN_SECRET as string, { expiresIn: '1d' });
 
             res.status(200).json({ token, user });
         } catch (error) {
