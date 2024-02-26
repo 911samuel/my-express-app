@@ -14,7 +14,7 @@ const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     try {
-        const decoded: any = jwt.verify(token, process.env.LOGIN_SECRET!);
+        const decoded: any = jwt.verify(token, process.env.LOGIN_SECRET || 'I0H1A9G2sam');
 
         console.log("Decoded Token in isAdmin:", decoded);
 

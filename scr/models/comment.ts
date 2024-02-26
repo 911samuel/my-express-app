@@ -3,7 +3,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IComment extends Document {
     content: string;
     author: string; 
-    blog_id: string; 
+    brand_id: number; 
 }
 
 const commentSchema: Schema = new Schema({
@@ -12,13 +12,11 @@ const commentSchema: Schema = new Schema({
         required: true
     },
     author: {
-        type: Schema.Types.ObjectId,
-        ref: 'user', 
+        type: String,
         required: true
     },
-    blog_id: {
-        type: Schema.Types.ObjectId,
-        ref: 'brand', 
+    brand_id: {
+        type: String, 
         required: true
     }
 }, { timestamps: true });

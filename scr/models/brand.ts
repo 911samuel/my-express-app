@@ -1,5 +1,4 @@
 import mongoose, { Document, Schema } from 'mongoose';
-
 export interface IBrand extends Document {
     title: string;
     author: string;

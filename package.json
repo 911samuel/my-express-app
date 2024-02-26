@@ -8,7 +8,7 @@
     "dev": "npm run clean && npm run build && npm run dev:watch",
     "start": "nodemon scr/server.ts",
     "build": "tsc",
-    "test": "cross-env NODE_ENV=test ts-node -O '{\"module\":\"CommonJS\"}' jest --testTimeout=5000 --verbose",
+    "test": "cross-env NODE_ENV=test jest",
     "lint": "eslint .",
     "clean": "rm -rf dist"
   },
@@ -33,6 +33,7 @@
     "body-parser": "^1.20.2",
     "cross-env": "^7.0.3",
     "dotenv": "^16.4.5",
+    "ejs": "^3.1.9",
     "express": "^4.18.2",
     "express-validator": "^7.0.1",
     "jsonwebtoken": "^9.0.2",

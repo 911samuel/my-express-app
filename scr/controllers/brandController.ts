@@ -19,7 +19,8 @@ const index = async (
     const brands = await Brand.find();
     res.json({ brands });
   } catch (error) {
-    res.status(500).json({ message: "An error occurred" });
+    console.error("Error fetching brands:", error);
+    res.status(500).json({ error: "An error occurred while fetching brands", details: error});
   }
 };
 
@@ -36,13 +37,14 @@ const show = async (
     }
     res.json({ brand });
   } catch (error) {
+    console.error("Error fetching brand:", error);
     next(error);
   }
 };
 
 const store = async (req: Request, res: Response, next: NextFunction) => {
   const { title, author, category, description } = req.body;
-  const errors = validationResult(req);
+  const errors = validationResult(req.body);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
@@ -53,12 +55,14 @@ const store = async (req: Request, res: Response, next: NextFunction) => {
       author,
       category,
       description,
+      avatar: req.file?.path,
     });
     const savedBrand = await brand.save();
     res
       .status(201)
       .json({ message: "The brand was added successfully"});
   } catch (error) {
+    console.error("Error saving brand:", error);
     res.status(500).json({ error: "Error on save the brand" });
   }
 };
@@ -86,6 +90,7 @@ const update = async (req: Request, res: Response, next: NextFunction) => {
         brand: updatedBrand,
       });
   } catch (error) {
+    console.error("Error updating brand:", error);
     next(error);
   }
 };
@@ -99,6 +104,7 @@ const deleteBrand = async (req: Request, res: Response, next: NextFunction) => {
     }
     res.status(200).json({ message: `The brand was deleted successfully.` });
   } catch (error) {
+    console.error("Error deleting brand:", error);
     next(error);
   }
 };
@@ -108,6 +114,7 @@ const deleteAll = async (req: Request, res: Response, next: NextFunction) => {
     await Brand.deleteMany({});
     res.status(200).json({ message: `All brands were deleted successfully.` });
   } catch (error) {
+    console.error("Error deleting all brands:", error);
     next(error);
   }
 };

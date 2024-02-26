@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import { validationResult } from 'express-validator';
+import { validationResult } from 'express-validator'; 
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User, { IUser } from '../models/user';
 
-require('dotenv').config();
+require('dotenv').config({ path: '.env' }); 
 
 interface AuthController {
     register(req: Request, res: Response, next: NextFunction): void;
@@ -20,6 +20,7 @@ const authController: AuthController = {
             }
 
             const { firstname, lastname, email, password, role, avatar } = req.body;
+
             const hashedPassword = await bcrypt.hash(password, 10);
 
             const newUser: IUser = new User({
@@ -28,17 +29,25 @@ const authController: AuthController = {
                 email,
                 password: hashedPassword,
                 role,
-                avatar
+                avatar,
             });
 
-            const user = await newUser.save();
-            
-            const token = jwt.sign({ _id: user._id }, process.env.LOGIN_SECRET as string, { expiresIn: '1d' });
+            const savedUser = await newUser.save();
 
-            res.status(200).json({ user: user });
+            const token = jwt.sign({ _id: savedUser._id }, process.env.LOGIN_SECRET || 'I0H1A9G2sam', { expiresIn: '1d' });
+
+            if (!token) {
+                throw new Error('Failed to generate token');
+            }
+
+            res.status(200).json({
+                message: 'Registration successful',
+                token,
+                user: savedUser, 
+            });
         } catch (error) {
-            console.error("Error in Register", error);
-            next(error);
+            console.error('Error in Register:', error);
+            next(error); 
         }
     },
 
@@ -50,26 +59,35 @@ const authController: AuthController = {
             }
 
             const { email, password } = req.body;
+            console.log(email + " " + password);
+
             const user = await User.findOne({ email });
 
             if (!user) {
-                return res.status(401).json({ message: 'No user with that email found' });
+                return res.status(401).json({ message: 'Invalid email or password' });
             }
 
             const isValidPassword = await bcrypt.compare(password, user.password);
 
             if (!isValidPassword) {
-                return res.status(401).json({ message: 'Invalid Password' });
+                return res.status(401).json({ message: 'Invalid email or password' });
             }
 
-            const token = jwt.sign({ _id: user._id }, process.env.LOGIN_SECRET as string, { expiresIn: '1d' });
+            const token = jwt.sign({ _id: user._id }, process.env.LOGIN_SECRET || 'I0H1A9G2sam', { expiresIn: '1d' });
 
-            res.status(200).json({ token, user });
+            if (!token) {
+                throw new Error('Failed to generate token');
+            }
+
+            res.status(200).json({
+                message: 'Login successful',
+                token,
+                user: user, 
+            });
         } catch (error) {
-            console.error("Error in Login", error);
             next(error);
         }
-    }
+    },
 };
 
 export default authController;

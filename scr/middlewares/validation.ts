@@ -1,9 +1,10 @@
 import { body } from 'express-validator';
 
 const storeValidationRules = [
-  body('title').notEmpty().withMessage('Title is required'),
-  body('author').notEmpty().withMessage('Author is required'),
+  body('title').notEmpty().withMessage('Title is required').trim(),
+  body('author').notEmpty().withMessage('Author is required').trim(),
 ];
+
 
 const updateValidationRules = [
   body('title').notEmpty().withMessage('Title is required'),
@@ -23,9 +24,8 @@ const loginValidationRules = [
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
 ];
 
-const createCommentValidationRules = [
-  body('content').trim().notEmpty().withMessage('Comment content is required'),
-  body('author').trim().notEmpty().withMessage('Author name is required'),
+const commentValidationRules = [
+  body('content').trim().notEmpty().withMessage('Comment content is required')
 ];
 
-export { storeValidationRules, updateValidationRules, registerValidationRules, loginValidationRules, createCommentValidationRules };
+export { storeValidationRules, updateValidationRules, registerValidationRules, loginValidationRules, commentValidationRules };

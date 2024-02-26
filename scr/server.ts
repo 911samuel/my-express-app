@@ -1,7 +1,5 @@
 import express, { Request, Response, NextFunction } from "express";
-import mongoose from "mongoose";
-import morgan from "morgan";
-import bodyParser from "body-parser";
+import bodyParser from 'body-parser';
 import path from "path";
 
 require('dotenv').config();
@@ -9,6 +7,9 @@ require('dotenv').config();
 import BrandRoute from "./routes/brand";
 import UserRoute from "./routes/auth";
 import commentRoute from "./routes/commentsRoutes";
+
+import mongoose from "mongoose";
+import morgan from "morgan";
 
 mongoose
   .connect("mongodb://localhost:27017/test")
@@ -18,8 +19,9 @@ mongoose
 const app = express();
 
 app.use(morgan("dev"));
+
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true })); 
 
 app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -50,4 +52,4 @@ process.on("SIGINT", () => {
   });
 });
 
-export  default server;
+export default server;

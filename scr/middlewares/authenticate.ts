@@ -18,7 +18,7 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
 
         console.log("Token:", token); 
 
-        const secret = process.env.LOGIN_SECRET!;
+        const secret = process.env.LOGIN_SECRET || 'I0H1A9G2sam';
         
         if (!secret) {
             return res.status(500).json({ error: 'Server misconfiguration: Missing login token secret' });
