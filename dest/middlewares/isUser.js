@@ -30,4 +30,5 @@ const isUser = async (req, res, next) => {
         return res.status(401).json({ message: 'Invalid token', error: error });
     }
 };
-exports.default = isUser;
+const _default = isUser;
+export { _default as default };
