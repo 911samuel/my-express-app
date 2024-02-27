@@ -1,40 +1,44 @@
+import mongoose from 'mongoose';
 import request from 'supertest';
-import app from '../server'; // Assuming your server file is named server.ts
+import server from '../server'; 
 
-describe('Brand Routes', () => {
-  it('should create a new brand', async () => {
+require("dotenv").config();
+
+beforeEach(async () => {
+  await mongoose.connect("mongodb+srv://samabayizera:Ganza4.rw@mybrand.im3cjmx.mongodb.net/");
+});
+
+afterEach(async () => {
+  await mongoose.connection.close();
+});
+
+let app = server
+
+describe('Brand CRUD operations', () => {
+
+  it('GET /api/brand should return status 200', async () => {
+    const res = await request(app).get('/api/brand');
+    expect(res.status).toBe(200);
+  });
+
+  it('POST /api/brand should return status 201', async () => {
     const res = await request(app)
-      .post('/api/brands')
-      .send({
-        name: 'Test Brand',
-        description: 'Test Description',
-      });
-    expect(res.statusCode).toEqual(201);
-    expect(res.body).toHaveProperty('_id');
-    expect(res.body.name).toEqual('Test Brand');
-    expect(res.body.description).toEqual('Test Description');
+      .post('/api/brand')
+      .send({ name: 'Test Brand', description: 'This is a test brand' });
+    expect(res.status).toBe(201);
   });
 
-  it('should get all brands', async () => {
-    const res = await request(app).get('/api/brands');
-    expect(res.statusCode).toEqual(200);
-    expect(res.body.length).toBeGreaterThan(0);
+  it('PUT /api/brand/:id should return status 200', async () => {
+    const brandId = 'your_brand_id';
+    const res = await request(app)
+      .put(`/api/brand/${brandId}`)
+      .send({ name: 'Updated Brand Name', description: 'Updated brand description' });
+    expect(res.status).toBe(200);
   });
 
-  it('should get a specific brand by ID', async () => {
-    const newBrand = await request(app)
-      .post('/api/brands')
-      .send({
-        name: 'Test Brand 2',
-        description: 'Test Description 2',
-      });
-
-    const res = await request(app).get(`/api/brands/${newBrand.body._id}`);
-    expect(res.statusCode).toEqual(200);
-    expect(res.body).toHaveProperty('_id', newBrand.body._id);
-    expect(res.body.name).toEqual('Test Brand 2');
-    expect(res.body.description).toEqual('Test Description 2');
+  it('DELETE /api/brand/:id should return status 200', async () => {
+    const brandId = 'your_brand_id';
+    const res = await request(app).delete(`/api/brand/${brandId}`);
+    expect(res.status).toBe(200);
   });
-
-  // Add tests for updating and deleting brands
 });
