@@ -12,7 +12,7 @@ import mongoose, { ConnectOptions } from "mongoose";
 import morgan from "morgan";
 
 mongoose
-  .connect("mongodb://localhost:27017/mydatabase")
+  .connect("mongodb://localhost:27017/test")
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
