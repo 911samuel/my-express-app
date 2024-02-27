@@ -16,8 +16,6 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
             return res.status(401).json({ error: 'Missing Authorization Header' });
         }
 
-        console.log("Token:", token); 
-
         const secret = process.env.LOGIN_SECRET || 'I0H1A9G2sam';
         
         if (!secret) {
@@ -39,7 +37,6 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
         (req as AuthenticatedRequest).user = user; 
         next();
     } catch (err) {
-        console.log("Error in authentication:", err); 
         return res.status(401).json({ error: 'Invalid Token' });
     }
 };

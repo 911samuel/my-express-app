@@ -31,8 +31,6 @@ const addComment = async (
 
         const author = brand.author;
 
-        console.log(author + ' '+ brandId)
-
         const newComment: IComment = new Comment({
             content,
             author: author,

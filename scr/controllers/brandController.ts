@@ -60,7 +60,7 @@ const store = async (req: Request, res: Response, next: NextFunction) => {
     const savedBrand = await brand.save();
     res
       .status(201)
-      .json({ message: "The brand was added successfully"});
+      .json({ message: "The brand was added successfully", brand: savedBrand} );
   } catch (error) {
     console.error("Error saving brand:", error);
     res.status(500).json({ error: "Error on save the brand" });

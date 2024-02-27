@@ -7,16 +7,12 @@ require('dotenv').config();
 const isUser = async (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization?.split(' ')[1];
 
-    console.log("Token in isUser:", token);
-
     if (!token) {
         return res.status(401).json({ message: 'No token provided' });
     }
 
     try {
         const decoded: any = jwt.verify(token, process.env.LOGIN_SECRET || 'I0H1A9G2sam');
-
-        console.log("Decoded Token in isUser:", decoded);
 
         const user = await User.findById(decoded._id);
 
