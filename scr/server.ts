@@ -14,7 +14,7 @@ import mongoose, { ConnectOptions } from "mongoose";
 import morgan from "morgan";
 
 mongoose
-  .connect("mongodb+srv://samabayizera:Ganza4.rw@mybrand.im3cjmx.mongodb.net/testing")
+  .connect("mongodb+srv://abayizeraeaz:Ganza4.rw@testing.z8gytz3.mongodb.net/")
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
