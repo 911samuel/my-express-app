@@ -1,3 +1,10 @@
+name: MY BRAND
+
+on:
+  push:
+    branches:
+      - main  
+
 jobs:
   your-job:
     runs-on: ubuntu-latest
