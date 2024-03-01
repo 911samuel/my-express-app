@@ -1,0 +1,9 @@
+jobs:
+  your-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up environment variables
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        run: |
+          ./codecov --verbose upload-process --fail-on-error -t "${CODECOV_TOKEN}" -n 'service'-"${GITHUB_RUN_ID}" -F service -f coverage-service.xml
