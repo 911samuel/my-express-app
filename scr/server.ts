@@ -13,10 +13,24 @@ import comment from "./routes/comments";
 import mongoose, { ConnectOptions } from "mongoose";
 import morgan from "morgan";
 
-mongoose
-  .connect("mongodb+srv://abayizeraeaz:Ganza4.rw@testing.z8gytz3.mongodb.net/")
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+const connectMongodb=()=>{
+  const MYBRAND_MONGODB_URI = process.env.MYBRAND_MONGODB_URI
+  if(!MYBRAND_MONGODB_URI){
+      console.log("Can not read mongoo string");
+      return;
+  }else{
+      mongoose.connect(MYBRAND_MONGODB_URI)
+      .then(()=>{
+          console.log("dataBase successfully connected")
+         
+      }).catch((err:any)=>{
+          console.log("dataBase failed to connect:",err)
+      })
+  }
+
+}
+
+connectMongodb();
 
 const app = express();
 

@@ -30,14 +30,15 @@ const single = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 const create = async (req: Request, res: Response, next: NextFunction) => {
-  const { title, author, category, description } = req.body;
-  const errors = validationResult(req);
+  const errors = validationResult(req.body);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
 
+  const { title, author, category, description } = req.body;
+
   try {
-    const blog = new Blog({
+    const blog: IBlog =  new Blog({
       title,
       author,
       category,
@@ -103,3 +104,4 @@ const deleteAll = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 export { all, single, create, update, delete1, deleteAll };
+

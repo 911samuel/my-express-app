@@ -21,6 +21,7 @@ const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
         }
 
         if (user.role !== 'admin') {
+            console.log(user.role);
             return res.status(403).json({ message: 'Unauthorized: User is not an admin' });
         }
 

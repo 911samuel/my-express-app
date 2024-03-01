@@ -8,7 +8,8 @@ require("dotenv").config({ path: ".env" });
 
 const signUp = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const errors = validationResult(req);
+    const errors = validationResult(req.body);
+    console.log(errors)
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
@@ -53,7 +54,7 @@ const signUp = async (req: Request, res: Response, next: NextFunction) => {
 
 const signIn = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const errors = validationResult(req);
+    const errors = validationResult(req.body);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
@@ -94,13 +95,13 @@ const signIn = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 const update = async (req: Request, res: Response, next: NextFunction) => {
+  const userId  = req.params.id;
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { userId } = req.params;
     const { firstname, lastname, username, email, password, role, profile } = req.body;
 
     const updateFields: Partial<IUser> = {};
@@ -137,13 +138,12 @@ const update = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 const delete1 = async (req: Request, res: Response, next: NextFunction) => {
+  const userId = req.params.id;
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-
-    const { userId } = req.params;
 
     const deletedUser = await User.findByIdAndDelete(userId);
 

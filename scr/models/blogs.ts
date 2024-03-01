@@ -8,7 +8,7 @@ export interface IBlog extends Document {
 }
 
 const BlogSchema: Schema = new Schema({
-    title: { type: String, required: true },
+    title: { type: String, required: true, unique: true },
     author: { type: String, required: true },
     category: { type: String},
     description: { type: String },
