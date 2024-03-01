@@ -42,7 +42,7 @@ const create = async (req: Request, res: Response, next: NextFunction) => {
       author,
       category,
       description,
-      avatar: req.file?.path,
+      imgUrl: req.file?.path,
     });
     const savedblog = await blog.save();
     res.status(201).json({ message: "The blog was added successfully", blog: savedblog });

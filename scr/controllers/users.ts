@@ -39,9 +39,11 @@ const signUp = async (req: Request, res: Response, next: NextFunction) => {
       throw new Error("Failed to generate token");
     }
 
+    const userWithoutPassword = { ...savedUser.toObject(), password: undefined };
+
     return res.status(200).json({
       message: "Registration successful",
-      token,
+      token, userWithoutPassword
     });
   } catch (error) {
     console.error("Error in Register:", error);
@@ -80,9 +82,11 @@ const signIn = async (req: Request, res: Response, next: NextFunction) => {
       throw new Error("Failed to generate token");
     }
 
+    const userWithoutPassword = { ...user.toObject(), password: undefined };
+
     return res.status(200).json({
       message: "Login successful",
-      token,
+      token, userWithoutPassword
     });
   } catch (error) {
     next(error);
@@ -91,6 +95,11 @@ const signIn = async (req: Request, res: Response, next: NextFunction) => {
 
 const update = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
     const { userId } = req.params;
     const { firstname, lastname, username, email, password, role, profile } = req.body;
 
@@ -117,9 +126,11 @@ const update = async (req: Request, res: Response, next: NextFunction) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    const userWithoutPassword = { ...updatedUser.toObject(), password: undefined };
+
     return res
       .status(200)
-      .json({ message: "User updated successfully", user: updatedUser });
+      .json({ message: "User updated successfully", user: userWithoutPassword });
   } catch (error) {
     next(error);
   }
@@ -127,6 +138,11 @@ const update = async (req: Request, res: Response, next: NextFunction) => {
 
 const delete1 = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
     const { userId } = req.params;
 
     const deletedUser = await User.findByIdAndDelete(userId);
@@ -143,6 +159,11 @@ const delete1 = async (req: Request, res: Response, next: NextFunction) => {
 
 const deleteAll = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    
     await User.deleteMany({});
     return res
       .status(200)
