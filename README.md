@@ -25,3 +25,5 @@ Initial installation
    
 6.To  start server
 zwg-dmyd-zbp
+
+COVERALLS_REPO_TOKEN=GewFjbsIr00NlLHCLzChmA2oRcYT2NzKo
