@@ -1,24 +1,27 @@
-name: CI
+name: Node.js Build and Run
 
 on:
   push:
     branches:
-      - main
+      - main  # Adjust the branch name if necessary
 
 jobs:
-  test:
+  build-node:
     runs-on: ubuntu-latest
+    container: node:16
 
     steps:
+      - name: Check Node.js version
+        run: node --version
+
+      - name: Check npm version
+        run: npm --version
+
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Run tests
-        run: |
-          # Add commands to run your tests here
+      - name: Install dependencies
+        run: npm install
 
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4.0.1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          slug: 911samuel/my-express-app
+      - name: Run the application
+        run: node index.js
