@@ -9,6 +9,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      MYBRAND_MONGODB_URI: ${{ secrets.MYBRAND_MONGODB_URI }}
+      TEST_MONGODB_URI: ${{ secrets.TEST_MONGODB_URI }}
+      LOGIN_SECRET: ${{ secrets.LOGIN_SECRET }}
     strategy:
       matrix:
         node-version: [14.x, 16.x, 18.x]
@@ -21,9 +26,14 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         run: npm install
+<<<<<<< HEAD
       - name: Install dependencies in src directory
         run: |
           cd src
           npm install
       - name: Build
         run: npm run build
+=======
+      - name: Run tests with coverage
+        run: npm test -- --coverage
+>>>>>>> 01a69e3ba65f208bd226d6e400872374012a3ced
