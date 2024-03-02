@@ -26,4 +26,4 @@ Initial installation
 6.To  start server
 zwg-dmyd-zbp
 
-COVERALLS_REPO_TOKEN=GewFjbsIr00NlLHCLzChmA2oRcYT2NzKo
+[![Node.js CI](https://github.com/911samuel/my-express-app/actions/workflows/node.js.yml/badge.svg?branch=main)](https://github.com/911samuel/my-express-app/actions/workflows/node.js.yml)
