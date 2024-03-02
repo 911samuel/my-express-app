@@ -29,6 +29,6 @@ const apiDoc = {
 };
 
 const outputFilePath = './swagger_output.json';
-const endpointsFilePaths = ['./scr/server.ts']; 
+const endpointsFilePaths = ['./scr/index.ts']; 
 
 swaggerAutogen({ openapi: '3.0.0' })(outputFilePath, endpointsFilePaths, apiDoc);

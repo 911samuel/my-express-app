@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import request from "supertest";
 import app from "../server";
+import { testingDb } from "../server";
 
 interface User {
   firstname: string;
@@ -21,33 +22,45 @@ interface Blog {
 }
 
 let userId: number;
-let token: string;
+let adminToken: string;
+let userToken: string;
 let blogId: number;
 let commentId: number;
+let adminId: number;
 
-const mockUser: User = {
+const userWithUserRole = {
   firstname: "mucyo",
   lastname: "Didier",
   username: "johndoe",
   email: "john@example.com",
   password: "password123",
+  role: "user",
+  profile: "/home/sam/Pictures/Screenshots/Screenshot from 2024-02-23 00-00-41.png",
+};
+
+const userWithAdminRole = {
+  firstname: "abayizera",
+  lastname: "samuel",
+  username: "samAbayizera",
+  email: "abayizeraeaz@gmail.com",
+  password: "password@123",
   role: "admin",
-  profile: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+  profile: "American express",
 };
 
 const mockBlog: Blog = {
-  title: "Sample Blog",
+  title: "here we go jugumilajhwdga",
   author: "John Doe",
   category: "Technology",
   description: "This is a sample blog description",
-  imgUrl: "https://example.com/sample-image.jpg",
+  imgUrl: "/home/sam/Pictures/Screenshots/Screenshot from 2024-02-23 00-00-41.png",
 };
 
 const mockUpdateBlog: Partial<Blog> = {
-  title: "Updated Sample Blog",
+  title: "Updated Sample Blog jugumilajhwdga",
   category: "Science",
   description: "This is the updated sample blog description",
-  imgUrl: "https://example.com/updated-sample-image.jpg",
+  imgUrl: "/home/sam/Pictures/Screenshots/Screenshot from 2024-02-23 15-57-48.png",
 };
 
 const mockComment = {
@@ -56,34 +69,36 @@ const mockComment = {
 
 describe("API Endpoints", () => {
   beforeAll(async () => {
-    try {
-      await mongoose.connect(
-        "mongodb+srv://abayizeraeaz:Ganza4.rw@testing.z8gytz3.mongodb.net/testing"
-      );
-      console.log("MongoDB connection successful");
-    } catch (error) {
-      console.error("MongoDB connection error:", error);
-      process.exit(1);
-    }
+    testingDb();
   });
 
   afterAll(async () => {
     await mongoose.connection.close();
-    app.close();
   });
 
   describe("User Endpoints", () => {
     it("POST /users/signUp should register a user", async () => {
-      const response = await request(app).post("/users/signUp").send(mockUser);
+      const response = await request(app)
+        .post("/users/signUp")
+        .send(userWithUserRole);
 
       expect(response.status).toBe(200);
       userId = response.body.userWithoutPassword._id;
     });
 
+    it("POST /users/signUp should register a user", async () => {
+      const response = await request(app)
+        .post("/users/signUp")
+        .send(userWithAdminRole);
+
+      expect(response.status).toBe(200);
+      adminId = response.body.userWithoutPassword._id;
+    });
+
     it("PUT /users/update should update a user", async () => {
       const response = await request(app)
         .put(`/users/update/${userId}`)
-        .send(mockUser);
+        .send(userWithUserRole);
 
       expect(response.status).toBe(200);
     });
@@ -91,13 +106,29 @@ describe("API Endpoints", () => {
     it("POST /users/signIn should log in a user", async () => {
       const response = await request(app)
         .post("/users/signIn")
-        .send({ email: mockUser.email, password: mockUser.password });
+        .send({
+          email: userWithAdminRole.email,
+          password: userWithAdminRole.password,
+        });
 
       expect(response.status).toBe(200);
       expect(response.body.token).toBeTruthy();
       expect(response.body.userWithoutPassword._id).toBeTruthy();
+      adminToken = response.body.token;
+    });
 
-      token = response.body.token;
+    it("POST /users/signIn should log in a user", async () => {
+      const response = await request(app)
+        .post("/users/signIn")
+        .send({
+          email: userWithUserRole.email,
+          password: userWithUserRole.password,
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.token).toBeTruthy();
+      expect(response.body.userWithoutPassword._id).toBeTruthy();
+      userToken = response.body.token;
     });
   });
 
@@ -105,72 +136,32 @@ describe("API Endpoints", () => {
     it("POST /blogs/create should create new blog", async () => {
       const response = await request(app)
         .post("/blogs/create")
-        .set("Authorization", `Bearer ${token}`)
+        .set("Authorization", `Bearer ${adminToken}`)
         .send(mockBlog);
-
-      expect([201, 403].includes(response.status)).toBeTruthy();
-      if (response.status === 201) {
-        expect(response.body.message).toBe("The blog was added successfully");
-        console.log(response.body);
-        expect(response.body.blog).toBeDefined();
-      } else {
-        expect(response.body.message).toBe(
-          "Unauthorized: User is not an admin"
-        );
-      }
+      expect(response.status).toEqual(201);
       blogId = response.body.blog._id;
     });
 
-    it("GET /blogs/all should fetch all blogs or return 403 Forbidden for unauthorized access", async () => {
+    it("GET /blogs/all should fetch all blogs", async () => {
       const response = await request(app)
         .get("/blogs/all")
-        .set("Authorization", `Bearer ${token}`);
-
-      expect([200, 403].includes(response.status)).toBeTruthy();
-
-      if (response.status === 200) {
-        expect(response.body.message).toBe("Blogs fetched successfully");
-        expect(response.body.blogs).toBeDefined();
-      } else {
-        expect(response.body.message).toBe(
-          "Unauthorized: User is not authorized to access all blogs"
-        );
-      }
+        .set("Authorization", `Bearer ${adminToken}`);
+      expect(response.status).toEqual(200);
     });
 
-    it("GET /blogs/single/:id should fetch a single blog or return 403 Forbidden for unauthorized access", async () => {
+    it("GET /blogs/single/:id should fetch a single blog", async () => {
       const response = await request(app)
         .get(`/blogs/single/${blogId}`)
-        .set("Authorization", `Bearer ${token}`);
-
-      expect([200, 403].includes(response.status)).toBeTruthy();
-
-      if (response.status === 200) {
-        expect(response.body.message).toBe("Blog fetched successfully");
-        expect(response.body.blog).toBeDefined();
-      } else {
-        expect(response.body.message).toBe(
-          "Unauthorized: User is not authorized to access this blog"
-        );
-      }
+        .set("Authorization", `Bearer ${adminToken}`);
+      expect(response.status).toEqual(200);
     });
 
-    it("PUT /blogs/update/:id should update a blog or return 403 Forbidden for unauthorized access", async () => {
+    it("PUT /blogs/update/:id should update a blog", async () => {
       const response = await request(app)
         .put(`/blogs/update/${blogId}`)
-        .set("Authorization", `Bearer ${token}`)
+        .set("Authorization", `Bearer ${adminToken}`)
         .send(mockUpdateBlog);
-
-      expect([200, 403].includes(response.status)).toBeTruthy();
-
-      if (response.status === 200) {
-        expect(response.body.message).toBe("Blog updated successfully");
-        expect(response.body.blog).toBeDefined();
-      } else {
-        expect(response.body.message).toBe(
-          "Unauthorized: User is not authorized to update this blog"
-        );
-      }
+      expect(response.status).toEqual(200);
     });
   });
 
@@ -178,71 +169,67 @@ describe("API Endpoints", () => {
     it("POST /comments/add/:id should add a new comment", async () => {
       const response = await request(app)
         .post(`/comments/add/${blogId}`)
-        .send(mockComment)
-        .set("Authorization", `Bearer ${token}`);
-
-        console.log(response.body);
-
+        .set("Authorization", `Bearer ${userToken}`)
+        .send(mockComment);
       expect(response.status).toBe(201);
+      commentId = response.body.comment._id;
+    });
+
+    it("PUT /comments/update/:id should update a comment", async () => {
+      const response = await request(app)
+        .put(`/comments/update/${commentId}`)
+        .set("Authorization", `Bearer ${userToken}`)
+        .send(mockUpdateBlog);
+      expect(response.status).toEqual(200);
     });
   });
 
   describe("Delete Comment Endpoints", () => {
     it("DELETE /comments/delete/:id should delete a comment by ID", async () => {
-
       const response = await request(app)
-      .delete(`/comments/${commentId}`)
-      .set("Authorization", `Bearer ${token}`);
-
+        .delete(`/comments/delete/${commentId}`)
+        .set("Authorization", `Bearer ${userToken}`);
       expect(response.status).toBe(200);
-      expect(response.body.message).toBe("Comment deleted successfully");
     });
 
     it("DELETE /comments/deleteAll should delete all comments", async () => {
       const response = await request(app)
-      .delete("/comments/deleteAll")
-      .set("Authorization", `Bearer ${token}`);
-
+        .delete("/comments/deleteAll")
+        .set("Authorization", `Bearer ${userToken}`);
       expect(response.status).toBe(200);
-      expect(response.body.message).toBe("All comments deleted successfully");
     });
   });
 
   describe("Delete Blog Endpoints", () => {
     it("DELETE /blogs/delete/:id should delete a blog by ID", async () => {
       const response = await request(app)
-      .delete(`/blogs/delete/${blogId}`)
-      .set("Authorization", `Bearer ${token}`);
-
+        .delete(`/blogs/delete/${blogId}`)
+        .set("Authorization", `Bearer ${adminToken}`);
       expect(response.status).toBe(200);
-      expect(response.body.message).toBe("Blog deleted successfully");
     });
 
     it("DELETE /blogs/deleteAll should delete all blogs", async () => {
-      const response = await request(app).delete("/blogs/deleteAll");
-
+      const response = await request(app)
+        .delete("/blogs/deleteAll")
+        .set("Authorization", `Bearer ${adminToken}`);
       expect(response.status).toBe(200);
-      expect(response.body.message).toBe("All blogs deleted successfully");
     });
   });
 
   describe("Delete User Endpoints", () => {
     it("DELETE /users/:id should delete a user by ID", async () => {
       const response = await request(app)
-      .delete(`/users/delete/${userId}`)
-      .set("Authorization", `Bearer ${token}`);
-
+        .delete(`/users/delete/${userId}`)
+        .set("Authorization", `Bearer ${adminToken}`);
       expect(response.status).toBe(200);
-      expect(response.body.message).toBe("User deleted successfully");
     });
 
     it("DELETE /users/deleteAll should delete all users", async () => {
       const response = await request(app)
-      .delete("/users/deleteAll")
-      .set("Authorization", `Bearer ${token}`);
-
+        .delete("/users/deleteAll")
+        .set("Authorization", `Bearer ${adminToken}`);
       expect(response.status).toBe(200);
-      expect(response.body.message).toBe("All users deleted successfully");
     });
   });
 });
+

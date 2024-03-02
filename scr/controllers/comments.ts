@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
 import Comment, { IComment } from '../models/comments';
-import Blog, { IBlog } from "../models/blogs";
-import User, { IUser } from '../models/users';
+import { IBlog } from "../models/blogs";
+import { IUser } from '../models/users';
 
 interface RequestWithBlog extends Request {
     blog?: IBlog;
-    user?: IUser;
+    user?: any;
 }
 
 const add = async (req: RequestWithBlog, res: Response, next: NextFunction) => {
@@ -17,21 +17,17 @@ const add = async (req: RequestWithBlog, res: Response, next: NextFunction) => {
             return res.status(400).json({ errors: errors.array() });
         }
 
-        if (!req.user || !req.user._id) {
-            return res.status(401).json({ message: 'Unauthorized' });
+        const username = req.user.username;
+
+        if (!username) {
+            return res.status(404).json({ message: 'Username not found' });
         }
 
-        const userId = req.user._id; 
-        const { content } = req.body;
-
-        const brand = await Blog.findById(blogId);
-        if (!brand) {
-            return res.status(404).json({ message: 'Brand not found' });
-        }
+        const content  = req.body.content;
 
         const newComment: IComment = new Comment({
             content,
-            user_id: userId,
+            username: username,
             blog_id: blogId
         });
 
@@ -44,8 +40,9 @@ const add = async (req: RequestWithBlog, res: Response, next: NextFunction) => {
     }
 };
 
+
 const update = async (req: Request, res: Response, next: NextFunction) => {
-    const { commentId } = req.params;
+    const commentId  = req.params.id;
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -72,7 +69,7 @@ const update = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 const delete1 = async (req: Request, res: Response, next: NextFunction) => {
-    const { commentId } = req.params;
+    const commentId  = req.params.id;
     try {
         const deletedComment = await Comment.findByIdAndDelete(commentId);
 
@@ -87,4 +84,14 @@ const delete1 = async (req: Request, res: Response, next: NextFunction) => {
     }
 };
 
-export { add, update, delete1 };
+const deleteAll = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        await Comment.deleteMany({});
+        res.status(200).json({ message: `All comments were deleted successfully.` });
+    } catch (error) {
+        console.error("Error deleting all comments:", error);
+        next(error);
+    }
+};
+
+export { add, update, delete1, deleteAll };

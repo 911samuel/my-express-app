@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import Blog, { IBlog } from "../models/blogs";
 import { validationResult } from "express-validator";
+import isAdmin from "../middlewares/isAdmin";
 
 const all = async (req: Request, res: Response, next: NextFunction) => {
   try {

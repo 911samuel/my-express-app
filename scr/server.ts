@@ -1,36 +1,14 @@
 import express, { Request, Response, NextFunction } from "express";
 import bodyParser from 'body-parser';
 import path from "path";
-import swaggerUi from "swagger-ui-express";
-import swaggerOutPut from './documentation/swagger_output.json'
 
 require('dotenv').config();
 
 import blog from "./routes/blogs";
 import user from "./routes/users";
 import comment from "./routes/comments";
-
-import mongoose, { ConnectOptions } from "mongoose";
 import morgan from "morgan";
-
-const connectMongodb=()=>{
-  const MYBRAND_MONGODB_URI = process.env.MYBRAND_MONGODB_URI
-  if(!MYBRAND_MONGODB_URI){
-      console.log("Can not read mongoo string");
-      return;
-  }else{
-      mongoose.connect(MYBRAND_MONGODB_URI)
-      .then(()=>{
-          console.log("dataBase successfully connected")
-         
-      }).catch((err:any)=>{
-          console.log("dataBase failed to connect:",err)
-      })
-  }
-
-}
-
-connectMongodb();
+import mongoose from "mongoose";
 
 const app = express();
 
@@ -41,41 +19,29 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-app.use("/users", user
- /* 
-#swagger.tags = ['USER']
-*/
-);
-app.use("/blogs", blog
-/* 
-#swagger.tags = ['BLOG']
-*/
-);
-app.use("/comments", comment
-/* 
-#swagger.tags = ['COMMENT']
-*/
-);
+app.use("/users", user);
+app.use("/blogs", blog);
+app.use("/comments", comment);
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerOutPut));
+export const testingDb = () => {
+    const dbtest = process.env.TEST_MONGODB_URI;
+    if (!dbtest) {
+      console.log("Can not read mongoo string for testing");
+      return;
+    } else {
+      mongoose
+        .connect(dbtest)
+        .then(() => {
+          console.log("dataBase for testing successfully connected");
+        })
+        .catch((err: any) => {
+          console.log("dataBase for testing failed to connect:", err);
+        });
+    }
+  };
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
   res.status(500).send(`Something went wrong! Error: ${err.message}`);
 });
-
-const port: number = process.env.PORT ? parseInt(process.env.PORT) : 3000;
-
-const server = app.listen(port, () => {
-  console.log(`Server is listening on ${port}`);
-});
-
-process.on("SIGINT", () => {
-  console.log("Server shutting down...");
-  server.close(() => {
-    console.log("Server stopped");
-    process.exit(0);
-  });
-});
-
-export default server;
+export default app;

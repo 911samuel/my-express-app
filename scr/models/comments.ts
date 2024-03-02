@@ -2,8 +2,8 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IComment extends Document {
     content: string;
-    user_id: number; 
-    blog_id: number; 
+    username: string; 
+    blog_id: string; 
 }
 
 const commentSchema: Schema = new Schema({
@@ -11,12 +11,12 @@ const commentSchema: Schema = new Schema({
         type: String,
         required: true
     },
-    user_id: {
-        type: Number,
+    username: {
+        type: String,
         required: true
     },
     blog_id: {
-        type: Number, 
+        type: String, 
         required: true
     }
 }, { timestamps: true });

@@ -4,7 +4,12 @@ import User from '../models/users';
 
 require('dotenv').config();
 
-const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
+interface RequestWithUser extends Request {
+    user?: any; 
+}
+
+
+const isAdmin = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     const token = req.headers.authorization?.split(' ')[1];
 
     if (!token) {
@@ -24,6 +29,8 @@ const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
             console.log(user.role);
             return res.status(403).json({ message: 'Unauthorized: User is not an admin' });
         }
+
+        req.user = user;
 
         next();
     } catch (error) {

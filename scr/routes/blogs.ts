@@ -16,7 +16,7 @@ const router: Router = Router();
 router.get('/all',authenticate, isAdmin, all);
 router.get('/single/:id',authenticate, isAdmin, single);
 router.post('/create',authenticate, isAdmin, upload.single('imgUrl'), create);
-router.put('/update/:id', authenticate, isAdmin, update);
+router.put('/update/:id', authenticate, upload.single('imgUrl'), isAdmin, update);
 router.delete('/delete/:id',authenticate, authenticate, delete1);
 router.delete('/deleteAll', authenticate, isAdmin, deleteAll);
 
