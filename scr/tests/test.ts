@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 import request from "supertest";
 import app from "../server";
 import { testingDb } from "../server";
+import { describe, it, expect } from '@jest/globals';
+
 
 interface User {
   firstname: string;
