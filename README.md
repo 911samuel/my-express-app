@@ -1,5 +1,6 @@
 <h1 align="center">Welcome to readME.md 👋</h1>
 <p>
+<p>
 <h1 align="center">MY BRAND 👋</h1>
   <img alt="Version" src="https://img.shields.io/badge/version-1.0.0-blue.svg?cacheSeconds=2592000" />
   <a href="https://app.swaggerhub.com/apis/ABAYIZERAEAZ/my-brand_api_documentation/1.0.0#/default/get_api_brand_" target="_blank">
@@ -11,6 +12,7 @@
   <a href="https://twitter.com/AbayizeraSam" target="_blank">
     <img alt="Twitter: AbayizeraSam" src="https://img.shields.io/twitter/follow/AbayizeraSam.svg?style=social" />
   </a>
+  [![Node.js CI](https://github.com/911samuel/my-express-app/actions/workflows/node.js.yml/badge.svg)](https://github.com/911samuel/my-express-app/actions/workflows/node.js.yml)
 </p>
 
 > my brand backend implementation
@@ -41,10 +43,3 @@ npm run test
 * Twitter: [@AbayizeraSam](https://twitter.com/AbayizeraSam)
 * Github: [@911samuel](https://github.com/911samuel)
 * LinkedIn: [@abayizera-samuel](https://linkedin.com/abayizera-samuel)
-
-## Show your support
-
-Give a ⭐️ if this project helped you!
-
-***
-_This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_
