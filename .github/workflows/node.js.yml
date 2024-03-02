@@ -19,15 +19,13 @@ jobs:
         run: npm --version
 
       - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+        uses: actions/checkout@v3
 
       - name: Install dependencies
         run: npm install
 
+      - name: Build TypeScript files
+        run: npm run build
+
       - name: Run the application
-        run: node index.js
+        run: npx nodemon 
