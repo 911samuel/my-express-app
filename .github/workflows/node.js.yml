@@ -28,4 +28,4 @@ jobs:
         run: npm run build
 
       - name: Run the application
-        run: npx nodemon 
+        run: npm run test
