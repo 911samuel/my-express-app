@@ -13,7 +13,6 @@ jobs:
       matrix:
         node-version: [14.x, 16.x, 18.x]
     steps:
-<<<<<<< HEAD
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
@@ -28,25 +27,3 @@ jobs:
           npm install
       - name: Build
         run: npm run build
-=======
-    - uses: actions/checkout@v3
-
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-
-    - name: Install dependencies
-      run: npm ci
-      # Add error handling and debugging
-      if: ${{ failure() }}
-      continue-on-error: true
-      # Log npm debug logs if npm ci fails
-      env:
-        CI: true
-        NPM_CONFIG_LOGLEVEL: verbose
-
-    - name: Run tests
-      run: npm test
->>>>>>> 0e510b95b2f805b8f67d500a38fbee94178e180a
