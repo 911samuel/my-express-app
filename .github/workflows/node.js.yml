@@ -35,7 +35,7 @@ jobs:
         slug: 911samuel/my-express-app
 
     - name: Run application
-      run: npm start
+      run: npm run test
       env:
         MYBRAND_MONGODB_URI: ${{ secrets.MYBRAND_MONGODB_URI }}
         TEST_MONGODB_URI: ${{ secrets.TEST_MONGODB_URI }}
