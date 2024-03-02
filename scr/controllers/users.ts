@@ -52,6 +52,33 @@ const signUp = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+const all = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const users = await User.find();
+    res.json({ users });
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({
+      error: "An error occurred while fetching users",
+      details: error, 
+    });
+  }
+};
+
+const single = async (req: Request, res: Response, next: NextFunction) => {
+  const userId = req.params.id;
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json({ user });
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    next(error);
+  }
+};
+
 const signIn = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const errors = validationResult(req.body);
@@ -173,4 +200,4 @@ const deleteAll = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export { signUp, signIn, update, delete1, deleteAll };
+export { signUp, signIn, single, all, update, delete1, deleteAll };
