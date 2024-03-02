@@ -30,4 +30,4 @@ jobs:
         run: npm install
 
       - name: Run the application
-        run: node app.js
+        run: node index.js
