@@ -1,4 +1,4 @@
-<!-- ⚠️ This README has been generated from the file(s) "blueprint.md" ⚠️--><h1 align="center">Welcome to readME.md 👋</h1>
+<h1 align="center">Welcome to readME.md 👋</h1>
 <p>
 <p>
 <h1 align="center">MY BRAND 👋</h1>
@@ -20,37 +20,25 @@
 
 > my brand backend implementation
 
-
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#install)
-
-## ➤ Install
+## Install
 
 ```sh
 npm install
 ```
 
-
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#usage)
-
-## ➤ Usage
+## Usage
 
 ```sh
 npm run start
 ```
 
-
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#run-tests)
-
-## ➤ Run tests
+## Run tests
 
 ```sh
 npm run test
 ```
 
-
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#author)
-
-## ➤ Author
+## Author
 
 👤 **abayizera samuel**
 
