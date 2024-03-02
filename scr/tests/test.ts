@@ -1,7 +1,32 @@
+import express, { Request, Response, NextFunction } from "express";
 import mongoose from "mongoose";
 import request from "supertest";
-import app from "../server";
-import { testingDb } from "../server";
+import bodyParser from 'body-parser';
+import path from "path";
+import morgan from "morgan";
+import userRoutes from "../routes/users";
+import blogRoutes from "../routes/blogs";
+import commentRoutes from "../routes/comments";
+
+require('dotenv').config();
+
+const app = express();
+
+app.use(morgan("dev"));
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true })); 
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+app.use("/users", userRoutes);
+app.use("/blogs", blogRoutes);
+app.use("/comments", commentRoutes);
+
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error(err.stack);
+  res.status(500).send(`Something went wrong! Error: ${err.message}`);
+});
 
 interface User {
   firstname: string;
@@ -35,8 +60,7 @@ const userWithUserRole: User = {
   email: "john@example.com",
   password: "password123",
   role: "user",
-  profile:
-    "/home/sam/Pictures/Screenshots/Screenshot from 2024-02-23 00-00-41.png",
+  profile: "/home/sam/Pictures/Screenshots/Screenshot from 2024-02-23 00-00-41.png",
 };
 
 const userWithAdminRole: User = {
@@ -54,24 +78,33 @@ const mockBlog: Blog = {
   author: "John Doe",
   category: "Technology",
   description: "This is a sample blog description",
-  imgUrl:
-    "/home/sam/Pictures/Screenshots/Screenshot from 2024-02-23 00-00-41.png",
+  imgUrl: "/home/sam/Pictures/Screenshots/Screenshot from 2024-02-23 00-00-41.png",
 };
 
 const mockUpdateBlog: Partial<Blog> = {
   title: "Updated Sample Blog jugumilajhwdga",
   category: "Science",
   description: "This is the updated sample blog description",
-  imgUrl:
-    "/home/sam/Pictures/Screenshots/Screenshot from 2024-02-23 15-57-48.png",
+  imgUrl: "/home/sam/Pictures/Screenshots/Screenshot from 2024-02-23 15-57-48.png",
 };
 
 const mockComment = {
   content: "This is a sample comment",
 };
 
+const testingDbURI = process.env.TEST_MONGODB_URI;
+
 beforeAll(async () => {
-  testingDb();
+  if (testingDbURI) {
+    try {
+      await mongoose.connect(testingDbURI);
+      console.log("Connected to MongoDB");
+    } catch (error) {
+      console.error("Error connecting to MongoDB:", error);
+    }
+  } else {
+    console.error("TEST_MONGODB_URI environment variable is not defined.");
+  }
 });
 
 afterAll(async () => {
