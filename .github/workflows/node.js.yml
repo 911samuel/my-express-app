@@ -25,5 +25,3 @@ jobs:
         run: |
           cd src
           npm install
-      - name: Build
-        run: npm run build
