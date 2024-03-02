@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-          pip install pytest   
+          pip install pytest pytest-cov   # Install pytest and pytest-cov
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           MYBRAND_MONGODB_URI: ${{ secrets.MYBRAND_MONGODB_URI }}
@@ -29,7 +29,7 @@ jobs:
           LOGIN_SECRET: ${{ secrets.LOGIN_SECRET }}
 
       - name: Run tests and collect coverage
-        run: pytest --cov app
+        run: pytest --cov=app
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4-beta
