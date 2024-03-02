@@ -12,9 +12,9 @@
   <a href="https://twitter.com/AbayizeraSam" target="_blank">
     <img alt="Twitter: AbayizeraSam" src="https://img.shields.io/twitter/follow/AbayizeraSam.svg?style=social" />
   </a>
-  <a href = 'https://github.com/911samuel/my-express-app/actions/workflows/node.js.yml/badge.svg'>
-  <img alt = "Badge" scr = 'https://github.com/911samuel/my-express-app/actions/workflows/node.js.yml'>
-  </a>
+  <a href="https://codecov.io/gh/911samuel/my-express-app" > 
+ <img src="https://codecov.io/gh/911samuel/my-express-app/graph/badge.svg?token=DESP42A6WI"/> 
+ </a>
 </p>
 
 > my brand backend implementation
