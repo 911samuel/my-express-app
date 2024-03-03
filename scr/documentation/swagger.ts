@@ -13,19 +13,7 @@ const apiDoc = {
       description: 'Local server',
     },
   ],
-  paths: {
-    
-  },  
-  components: {
-    securitySchemes: {
-      apiKeyAuth: {
-        type: 'apiKey',
-        name: 'apiKey',
-        in: 'header',  
-      },
-    },
-  },
-  security: [{ apiKeyAuth: [] }],  
+  paths: {},  
 };
 
 const outputFilePath = './swagger_output.json';

@@ -3,35 +3,37 @@ import bodyParser from "body-parser";
 import path from "path";
 import swaggerUi from "swagger-ui-express";
 import swaggerOutPut from "./documentation/swagger_output.json";
+import cors from "cors";
+import morgan from "morgan";
+import mongoose from "mongoose";
 
 require("dotenv").config();
 
 import blog from "./routes/blogs";
 import user from "./routes/users";
 import comment from "./routes/comments";
-import morgan from "morgan";
-import mongoose from "mongoose";
 
 const db = process.env.MYBRAND_MONGODB_URI;
 if (!db) {
-  console.log("Can not read mongoo string");
+  console.log("Can not read MongoDB string");
 } else {
   mongoose
     .connect(db)
     .then(() => {
-      console.log("dataBase successfully connected");
+      console.log("Database successfully connected");
     })
     .catch((err: any) => {
-      console.log("dataBase failed to connect:", err);
+      console.log("Database failed to connect:", err);
     });
 }
 
 const app = express();
 
 app.use(morgan("dev"));
+app.use(cors()); 
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
@@ -60,7 +62,7 @@ app.use(
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerOutPut));
 
 app.use("/", (req, res) => {
-  res.send("welcome to my brand");
+  res.send("Welcome to My Brand");
 });
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

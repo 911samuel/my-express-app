@@ -96,6 +96,48 @@
         }
       }
     },
+    "/users/all": {
+      "get": {
+        "tags": [
+          "USER"
+        ],
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/users/single/{id}": {
+      "get": {
+        "tags": [
+          "USER"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/users/update/{id}": {
       "put": {
         "tags": [
@@ -115,6 +157,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
           },
           "404": {
             "description": "Not Found"
@@ -174,13 +219,16 @@
           "200": {
             "description": "OK"
           },
+          "400": {
+            "description": "Bad Request"
+          },
           "404": {
             "description": "Not Found"
           }
         }
       }
     },
-    "/users/updateAll": {
+    "/users/deleteAll": {
       "delete": {
         "tags": [
           "USER"
@@ -189,6 +237,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
           }
         }
       }
@@ -247,9 +298,6 @@
           },
           "400": {
             "description": "Bad Request"
-          },
-          "500": {
-            "description": "Internal Server Error"
           }
         },
         "requestBody": {
@@ -296,9 +344,6 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
           },
           "404": {
             "description": "Not Found"
@@ -391,9 +436,6 @@
           "400": {
             "description": "Bad Request"
           },
-          "401": {
-            "description": "Unauthorized"
-          },
           "404": {
             "description": "Not Found"
           },
@@ -464,7 +506,7 @@
       }
     },
     "/comments/delete/{id}": {
-      "post": {
+      "delete": {
         "tags": [
           "COMMENT"
         ],
@@ -491,20 +533,22 @@
           }
         }
       }
-    }
-  },
-  "components": {
-    "securitySchemes": {
-      "apiKeyAuth": {
-        "type": "apiKey",
-        "name": "apiKey",
-        "in": "header"
+    },
+    "/comments/deleteAll": {
+      "delete": {
+        "tags": [
+          "COMMENT"
+        ],
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
       }
     }
-  },
-  "security": [
-    {
-      "apiKeyAuth": []
-    }
-  ]
+  }
 }

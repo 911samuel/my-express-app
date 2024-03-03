@@ -1,16 +1,8 @@
 import express, { Router } from 'express';
 import { signUp, signIn, single, all, update, delete1, deleteAll } from '../controllers/users'; 
 import upload from '../middlewares/upload';
-import { validateUser, validateupdatedUser } from '../validations/users';
 
 const router: Router = Router(); 
-
-/**
- * @swagger
- * tags:
- *   - name: user
- *     description: Endpoints related to user
- */
 
 router.post('/signUp', upload.single('profile'), signUp);
 router.post('/signIn', signIn);

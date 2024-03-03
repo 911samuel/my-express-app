@@ -6,13 +6,6 @@ import isAdmin from "../middlewares/isAdmin";
 
 const router: Router = Router(); 
 
-/**
- * @swagger
- * tags:
- *   - name: blog
- *     description: Endpoints related to blog
- */
-
 router.get('/all',authenticate, isAdmin, all);
 router.get('/single/:id',authenticate, isAdmin, single);
 router.post('/create',authenticate, isAdmin, upload.single('imgUrl'), create);

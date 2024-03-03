@@ -25,7 +25,7 @@ const signUp = async (req: Request, res: Response, next: NextFunction) => {
       email,
       password: hashedPassword,
       role,
-      profile,
+      profile:req.file?.path,
     });
 
     const savedUser = await newUser.save();
@@ -120,9 +120,9 @@ const signIn = async (req: Request, res: Response, next: NextFunction) => {
     next(error);
   }
 };
-
 const update = async (req: Request, res: Response, next: NextFunction) => {
-  const userId  = req.params.id;
+  const userId = req.params.id;
+
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -135,14 +135,16 @@ const update = async (req: Request, res: Response, next: NextFunction) => {
 
     if (firstname) updateFields.firstname = firstname;
     if (lastname) updateFields.lastname = lastname;
-    if(username) updateFields.username = username;
+    if (username) updateFields.username = username;
     if (email) updateFields.email = email;
     if (password) {
       const hashedPassword = await bcrypt.hash(password, 10);
       updateFields.password = hashedPassword;
     }
     if (role) updateFields.role = role;
-    if (profile) updateFields.profile = profile ;
+    if (profile) {
+      updateFields.profile = req.file?.path;
+    }
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,
@@ -156,10 +158,9 @@ const update = async (req: Request, res: Response, next: NextFunction) => {
 
     const userWithoutPassword = { ...updatedUser.toObject(), password: undefined };
 
-    return res
-      .status(200)
-      .json({ message: "User updated successfully", user: userWithoutPassword });
+    return res.status(200).json({ message: "User updated successfully", user: userWithoutPassword });
   } catch (error) {
+    console.error("Error updating user:", error);
     next(error);
   }
 };

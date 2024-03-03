@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import Blog, { IBlog } from "../models/blogs";
 import { validationResult } from "express-validator";
-import isAdmin from "../middlewares/isAdmin";
 
 const all = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -11,7 +10,7 @@ const all = async (req: Request, res: Response, next: NextFunction) => {
     console.error("Error fetching blogs:", error);
     res.status(500).json({
       error: "An error occurred while fetching blogs",
-      details: error, 
+      details: error,
     });
   }
 };
@@ -31,48 +30,57 @@ const single = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 const create = async (req: Request, res: Response, next: NextFunction) => {
-  const errors = validationResult(req.body);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  const { title, author, category, description } = req.body;
-
   try {
-    const blog: IBlog =  new Blog({
+    const errors = validationResult(req.body);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { title, author, category, description } = req.body;
+
+    const blog: IBlog = new Blog({
       title,
       author,
       category,
       description,
       imgUrl: req.file?.path,
     });
-    const savedblog = await blog.save();
-    res.status(201).json({ message: "The blog was added successfully", blog: savedblog });
+
+    const savedBlog = await blog.save();
+    res.status(201).json({ message: "The blog was added successfully", blog: savedBlog });
   } catch (error) {
     console.error("Error saving blog:", error);
-    res.status(500).json({ error: error }); 
+    next(error);
   }
 };
 
 const update = async (req: Request, res: Response, next: NextFunction) => {
-  const { title, author, category, description } = req.body;
   const blogId = req.params.id;
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
   try {
+    const updatedFields: Partial<IBlog> = {
+      title: req.body.title,
+      author: req.body.author,
+      category: req.body.category,
+      description: req.body.description,
+    };
+
+    if (req.file) {
+      updatedFields.imgUrl = req.file.path;
+    }
+
     const updatedBlog = await Blog.findByIdAndUpdate(
       blogId,
-      { $set: { title, author, category, description } },
+      { $set: updatedFields },
       { new: true }
     );
+
     if (!updatedBlog) {
-      return res.status(404).json({ message: "Blog not found." });
+      return res.status(404).json({ message: 'Blog not found.' });
     }
+
     res.status(200).json({
-      message: `The blog was updated successfully.`,
-      blog: updatedBlog,
+      message: 'Blog updated successfully.',
+      data: updatedBlog,
     });
   } catch (error) {
     console.error("Error updating blog:", error);
@@ -83,8 +91,8 @@ const update = async (req: Request, res: Response, next: NextFunction) => {
 const delete1 = async (req: Request, res: Response, next: NextFunction) => {
   const blogId = req.params.id;
   try {
-    const deletedblog = await Blog.findByIdAndDelete(blogId);
-    if (!deletedblog) {
+    const deletedBlog = await Blog.findByIdAndDelete(blogId);
+    if (!deletedBlog) {
       return res.status(404).json({ message: "Blog not found." });
     }
     res.status(200).json({ message: `The blog was deleted successfully.` });
@@ -105,4 +113,3 @@ const deleteAll = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 export { all, single, create, update, delete1, deleteAll };
-
