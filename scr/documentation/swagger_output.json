@@ -46,12 +46,6 @@
                   },
                   "password": {
                     "example": "any"
-                  },
-                  "role": {
-                    "example": "any"
-                  },
-                  "profile": {
-                    "example": "any"
                   }
                 }
               }
@@ -185,12 +179,6 @@
                   },
                   "password": {
                     "example": "any"
-                  },
-                  "role": {
-                    "example": "any"
-                  },
-                  "profile": {
-                    "example": "any"
                   }
                 }
               }
@@ -246,10 +234,13 @@
     },
     "/blogs/all": {
       "get": {
-        "tags": [
-          "BLOG"
-        ],
+        "tags": ["BLOG"],
         "description": "",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -262,10 +253,13 @@
     },
     "/blogs/single/{id}": {
       "get": {
-        "tags": [
-          "BLOG"
-        ],
+        "tags": ["BLOG"],
         "description": "",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
@@ -288,10 +282,13 @@
     },
     "/blogs/create": {
       "post": {
-        "tags": [
-          "BLOG"
-        ],
+        "tags": ["BLOG"],
         "description": "",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "201": {
             "description": "Created"
@@ -327,10 +324,13 @@
     },
     "/blogs/update/{id}": {
       "put": {
-        "tags": [
-          "BLOG"
-        ],
+        "tags": ["BLOG"],
         "description": "",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
@@ -376,10 +376,13 @@
     },
     "/blogs/delete/{id}": {
       "delete": {
-        "tags": [
-          "BLOG"
-        ],
+        "tags": ["BLOG"],
         "description": "",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
@@ -402,10 +405,13 @@
     },
     "/blogs/deleteAll": {
       "delete": {
-        "tags": [
-          "BLOG"
-        ],
+        "tags": ["BLOG"],
         "description": "",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -415,10 +421,13 @@
     },
     "/comments/add/{id}": {
       "post": {
-        "tags": [
-          "COMMENT"
-        ],
+        "tags": ["COMMENT"],
         "description": "",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
@@ -461,10 +470,13 @@
     },
     "/comments/update/{id}": {
       "put": {
-        "tags": [
-          "COMMENT"
-        ],
+        "tags": ["COMMENT"],
         "description": "",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
@@ -507,10 +519,13 @@
     },
     "/comments/delete/{id}": {
       "delete": {
-        "tags": [
-          "COMMENT"
-        ],
+        "tags": ["COMMENT"],
         "description": "",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
@@ -536,10 +551,13 @@
     },
     "/comments/deleteAll": {
       "delete": {
-        "tags": [
-          "COMMENT"
-        ],
+        "tags": ["COMMENT"],
         "description": "",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -548,6 +566,14 @@
             "description": "Internal Server Error"
           }
         }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
       }
     }
   }
