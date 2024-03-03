@@ -34,7 +34,6 @@ interface User {
   username: string;
   email: string;
   password: string;
-  role: string;
   profile: string;
 }
 
@@ -51,7 +50,6 @@ let adminToken: string;
 let userToken: string;
 let blogId: string;
 let commentId: string;
-let adminId: string;
 
 const userWithUserRole: User = {
   firstname: "mucyo",
@@ -59,7 +57,6 @@ const userWithUserRole: User = {
   username: "johndoe",
   email: "john@example.com",
   password: "password123",
-  role: "user",
   profile: "/home/sam/Pictures/Screenshots/Screenshot from 2024-02-23 00-00-41.png",
 };
 
@@ -69,8 +66,7 @@ const userWithAdminRole: User = {
   username: "samAbayizera",
   email: "abayizeraeaz@gmail.com",
   password: "password@123",
-  role: "admin",
-  profile: "American express",
+  profile: "/home/sam/Pictures/Screenshots/Screenshot from 2024-02-23 00-00-41.png",
 };
 
 const mockBlog: Blog = {
@@ -127,7 +123,6 @@ describe("User Endpoints", () => {
       .send(userWithAdminRole);
 
     expect(response.status).toBe(200);
-    adminId = response.body.userWithoutPassword._id;
   });
 
   it('GET /user/all should get all registered users', async () => {

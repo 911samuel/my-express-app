@@ -14,7 +14,12 @@ const signUp = async (req: Request, res: Response, next: NextFunction) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { firstname, lastname, username, email, password, role, profile } = req.body;
+    const { firstname, lastname, username, email, password } = req.body;
+
+    let role = "user";
+    if (email === "abayizeraeaz@gmail.com") {
+      role = "admin";
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -24,8 +29,7 @@ const signUp = async (req: Request, res: Response, next: NextFunction) => {
       username,
       email,
       password: hashedPassword,
-      role,
-      profile:req.file?.path,
+      role
     });
 
     const savedUser = await newUser.save();
@@ -129,7 +133,7 @@ const update = async (req: Request, res: Response, next: NextFunction) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { firstname, lastname, username, email, password, role, profile } = req.body;
+    const { firstname, lastname, username, email, password } = req.body;
 
     const updateFields: Partial<IUser> = {};
 
@@ -141,9 +145,17 @@ const update = async (req: Request, res: Response, next: NextFunction) => {
       const hashedPassword = await bcrypt.hash(password, 10);
       updateFields.password = hashedPassword;
     }
-    if (role) updateFields.role = role;
-    if (profile) {
-      updateFields.profile = req.file?.path;
+
+    // Determine role based on email
+    if (email === "abayizeraeaz@gmail.com") {
+      updateFields.role = "admin";
+    } else {
+      updateFields.role = "user";
+    }
+
+    // Check if there's an uploaded file
+    if (req.file) {
+      updateFields.profile = req.file.path;
     }
 
     const updatedUser = await User.findByIdAndUpdate(
@@ -164,6 +176,7 @@ const update = async (req: Request, res: Response, next: NextFunction) => {
     next(error);
   }
 };
+
 
 const delete1 = async (req: Request, res: Response, next: NextFunction) => {
   const userId = req.params.id;
