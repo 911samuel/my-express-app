@@ -26,7 +26,6 @@ const isAdmin = async (req: RequestWithUser, res: Response, next: NextFunction) 
         }
 
         if (user.role !== 'admin') {
-            console.log(user.role);
             return res.status(403).json({ message: 'Unauthorized: User is not an admin' });
         }
 
@@ -34,7 +33,6 @@ const isAdmin = async (req: RequestWithUser, res: Response, next: NextFunction) 
 
         next();
     } catch (error) {
-        console.error("Error in isAdmin middleware:", error);
         return res.status(401).json({ message: 'Invalid token', error: error });
     }
 };

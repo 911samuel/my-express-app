@@ -7,6 +7,8 @@ import morgan from "morgan";
 import userRoutes from "../src/routes/users";
 import blogRoutes from "../src/routes/blogs";
 import commentRoutes from "../src/routes/comments";
+import upload from "../src/middlewares/upload";
+import supertest from "supertest";
 
 require('dotenv').config();
 
@@ -28,13 +30,20 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(500).send(`Something went wrong! Error: ${err.message}`);
 });
 
+app.post(
+  "/upload",
+  upload.single("file"),
+  (req: Request, res: Response) => {
+    res.status(200).json({ message: "File uploaded successfully" });
+  }
+);
+
 interface User {
   firstname: string;
   lastname: string;
   username: string;
   email: string;
   password: string;
-  profile: string;
 }
 
 interface Blog {
@@ -57,7 +66,6 @@ const userWithUserRole: User = {
   username: "johndoe",
   email: "john@example.com",
   password: "password123",
-  profile: "/home/sam/Pictures/Screenshots/Screenshot from 2024-02-23 00-00-41.png",
 };
 
 const userWithAdminRole: User = {
@@ -66,7 +74,6 @@ const userWithAdminRole: User = {
   username: "samAbayizera",
   email: "abayizeraeaz@gmail.com",
   password: "password@123",
-  profile: "/home/sam/Pictures/Screenshots/Screenshot from 2024-02-23 00-00-41.png",
 };
 
 const mockBlog: Blog = {
@@ -199,6 +206,16 @@ describe("Blog Endpoints", () => {
       .set("Authorization", `Bearer ${adminToken}`)
       .send(mockUpdateBlog);
     expect(response.status).toEqual(200);
+  });
+});
+
+describe("UPLOADS endponts", () => {
+  it('should upload a file successfully', async () => {
+    const response = await supertest(app)
+      .post("/upload")
+
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe('File uploaded successfully');
   });
 });
 

@@ -3,17 +3,20 @@ export interface IBlog extends Document {
     title: string;
     author: string;
     category: string;
-    description?: string;
-    imgUrl?: string;
+    description: string;
+    imgUrl: string;
 }
 
-const BlogSchema: Schema = new Schema({
+const BlogSchema: Schema = new Schema(
+  {
     title: { type: String, required: true, unique: true },
     author: { type: String, required: true },
-    category: { type: String},
-    description: { type: String },
-    imgUrl: { type: String }
-}, { timestamps: true });
+    category: { type: String, required: true },
+    description: { type: String, required: true },
+    imgUrl: { type: String, required: true },
+  },
+  { timestamps: true }
+);
 
 const Blog = mongoose.model<IBlog>('Blog', BlogSchema);
 

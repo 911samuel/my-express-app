@@ -7,7 +7,6 @@ export interface IUser extends Document {
     email: string;
     password: string;
     role: string;
-    profile: string;
 }
 
 const userSchema: Schema = new Schema({
@@ -36,9 +35,6 @@ const userSchema: Schema = new Schema({
     role: {
         type: String,
         required: true
-    },
-    profile: {
-        type: String
     }
 }, { timestamps: true });
 

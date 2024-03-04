@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import Blog, { IBlog } from "../models/blogs";
-import { validationResult } from "express-validator";
+import { validateBlog, validateUpdatedBlog } from "../utils/blogs";
 
 const all = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -31,23 +31,34 @@ const single = async (req: Request, res: Response, next: NextFunction) => {
 
 const create = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const errors = validationResult(req.body);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+    const validatedBlog = await validateBlog(req.body, res);
+
+    if ("validationErrors" in validatedBlog) {
+      return res.status(400).json(validatedBlog.validationErrors);
     }
 
     const { title, author, category, description } = req.body;
+
+    let imgUrl = ""; 
+
+    if (req.file && req.file.path) {
+      imgUrl = req.file.path; 
+    }
+
+    console.log(imgUrl);
 
     const blog: IBlog = new Blog({
       title,
       author,
       category,
       description,
-      imgUrl: req.file?.path,
+      imgUrl,
     });
 
     const savedBlog = await blog.save();
-    res.status(201).json({ message: "The blog was added successfully", blog: savedBlog });
+    res
+      .status(201)
+      .json({ message: "The blog was added successfully", blog: savedBlog });
   } catch (error) {
     console.error("Error saving blog:", error);
     next(error);
@@ -57,6 +68,12 @@ const create = async (req: Request, res: Response, next: NextFunction) => {
 const update = async (req: Request, res: Response, next: NextFunction) => {
   const blogId = req.params.id;
   try {
+    const validatedUpdatedBlog = await validateUpdatedBlog(req.body, res);
+
+    if ("validationErrors" in validatedUpdatedBlog) {
+      return res.status(400).json(validatedUpdatedBlog);
+    }
+    
     const updatedFields: Partial<IBlog> = {
       title: req.body.title,
       author: req.body.author,
@@ -75,11 +92,11 @@ const update = async (req: Request, res: Response, next: NextFunction) => {
     );
 
     if (!updatedBlog) {
-      return res.status(404).json({ message: 'Blog not found.' });
+      return res.status(404).json({ message: "Blog not found." });
     }
 
     res.status(200).json({
-      message: 'Blog updated successfully.',
+      message: "Blog updated successfully.",
       data: updatedBlog,
     });
   } catch (error) {

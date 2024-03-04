@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { validationResult } from "express-validator";
+import { validateUser, validateupdatedUser } from '../utils/users'
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User, { IUser } from "../models/users";
@@ -8,17 +8,21 @@ require("dotenv").config({ path: ".env" });
 
 const signUp = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const errors = validationResult(req.body);
-    console.log(errors)
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     const { firstname, lastname, username, email, password } = req.body;
 
-    let role = "user";
-    if (email === "abayizeraeaz@gmail.com") {
-      role = "admin";
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername) {
+      return res.status(400).json({ message: "Username is already taken" });
+    }
+
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
+      return res.status(400).json({ message: "Email is already registered" });
+    }
+
+    const validatedUser = await validateUser(req.body);
+    if ("validationErrors" in validatedUser) {
+      return res.status(400).json(validatedUser.validationErrors);
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -29,7 +33,7 @@ const signUp = async (req: Request, res: Response, next: NextFunction) => {
       username,
       email,
       password: hashedPassword,
-      role
+      role: email === "abayizeraeaz@gmail.com" ? "admin" : "user", 
     });
 
     const savedUser = await newUser.save();
@@ -44,11 +48,15 @@ const signUp = async (req: Request, res: Response, next: NextFunction) => {
       throw new Error("Failed to generate token");
     }
 
-    const userWithoutPassword = { ...savedUser.toObject(), password: undefined };
+    const userWithoutPassword = {
+      ...savedUser.toObject(),
+      password: undefined,
+    };
 
     return res.status(200).json({
       message: "Registration successful",
-      token, userWithoutPassword
+      token,
+      userWithoutPassword,
     });
   } catch (error) {
     console.error("Error in Register:", error);
@@ -56,10 +64,12 @@ const signUp = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+
 const all = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const users = await User.find();
-    res.json({ users });
+    const userWithoutPassword = { ...users, password: undefined };
+    return res.json({ userWithoutPassword });
   } catch (error) {
     console.error("Error fetching users:", error);
     res.status(500).json({
@@ -76,7 +86,10 @@ const single = async (req: Request, res: Response, next: NextFunction) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    res.json({ user });
+
+    const userWithoutPassword = { ...user, password: undefined };
+
+    return res.json({ userWithoutPassword });
   } catch (error) {
     console.error("Error fetching user:", error);
     next(error);
@@ -85,11 +98,6 @@ const single = async (req: Request, res: Response, next: NextFunction) => {
 
 const signIn = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const errors = validationResult(req.body);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
@@ -124,68 +132,56 @@ const signIn = async (req: Request, res: Response, next: NextFunction) => {
     next(error);
   }
 };
+
 const update = async (req: Request, res: Response, next: NextFunction) => {
   const userId = req.params.id;
 
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+ try {
+   const validatedUpdatedUser = await validateupdatedUser(req.body);
 
-    const { firstname, lastname, username, email, password } = req.body;
+   if ("validationErrors" in validatedUpdatedUser) {
+     return res.status(400).json(validatedUpdatedUser);
+   }
 
-    const updateFields: Partial<IUser> = {};
+   const { firstname, lastname, username, email, password } = req.body;
 
-    if (firstname) updateFields.firstname = firstname;
-    if (lastname) updateFields.lastname = lastname;
-    if (username) updateFields.username = username;
-    if (email) updateFields.email = email;
-    if (password) {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      updateFields.password = hashedPassword;
-    }
+   const updateFields: Partial<IUser> = {};
 
-    // Determine role based on email
-    if (email === "abayizeraeaz@gmail.com") {
-      updateFields.role = "admin";
-    } else {
-      updateFields.role = "user";
-    }
+   if (firstname) updateFields.firstname = firstname;
+   if (lastname) updateFields.lastname = lastname;
+   if (username) updateFields.username = username;
+   if (email) updateFields.email = email;
+   if (password) {
+     const hashedPassword = await bcrypt.hash(password, 10);
+     updateFields.password = hashedPassword;
+   }
 
-    // Check if there's an uploaded file
-    if (req.file) {
-      updateFields.profile = req.file.path;
-    }
+   const updatedUser = await User.findByIdAndUpdate(userId, updateFields, {
+     new: true,
+   });
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      updateFields,
-      { new: true }
-    );
+   if (!updatedUser) {
+     return res.status(404).json({ message: "User not found" });
+   }
 
-    if (!updatedUser) {
-      return res.status(404).json({ message: "User not found" });
-    }
+   const userWithoutPassword = {
+     ...updatedUser.toObject(),
+     password: undefined,
+   };
 
-    const userWithoutPassword = { ...updatedUser.toObject(), password: undefined };
-
-    return res.status(200).json({ message: "User updated successfully", user: userWithoutPassword });
-  } catch (error) {
-    console.error("Error updating user:", error);
-    next(error);
-  }
+   return res
+     .status(200)
+     .json({ message: "User updated successfully", user: userWithoutPassword });
+ } catch (error) {
+   console.error("Error updating user:", error);
+   next(error);
+ }
 };
 
 
 const delete1 = async (req: Request, res: Response, next: NextFunction) => {
   const userId = req.params.id;
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     const deletedUser = await User.findByIdAndDelete(userId);
 
     if (!deletedUser) {
@@ -200,11 +196,6 @@ const delete1 = async (req: Request, res: Response, next: NextFunction) => {
 
 const deleteAll = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-    
     await User.deleteMany({});
     return res
       .status(200)

@@ -5,7 +5,8 @@ import { IBlog } from '../models/blogs';
 const blogsZodSchema = z.object({
   title: z.string().min(1, { message: 'Title is required' }),
   author: z.string().min(1, { message: 'Author is required' }), 
-  imgUrl: z.string().min(1, { message: 'Image path is required' }),  
+  category:  z.string().min(1, { message: 'Category is required'}),
+  description: z.string().min(5, { message: 'Description should be at least 5 characters long' })
 });
 
 const updateBlogSchema = z.object({
@@ -22,20 +23,16 @@ const validateBlog = async (articleData: any, res: Response): Promise<UpdatedBlo
     return validatedData as UpdatedBlog;
   } catch (error) {
     if (error instanceof ZodError) {
-      console.error('Validation failed:', error.errors);
+      const validationError = error.errors[0];
+      const errorMessage = validationError.message;
 
-      const errorMessages: Record<string, string> = {};
-      error.errors.forEach((validationError) => {
-        const fieldName = validationError.path[0];
-        const errorMessage = validationError.message;
-        errorMessages[fieldName] = errorMessage;
-      });
-
+      const errorMessages: Record<string, string> = {
+        errorMessage,
+      };
       return { validationErrors: errorMessages };
     } else {
-      console.error('Unexpected error:', error);
-      return { validationErrors: { unexpected: 'Unexpected error occurred' } };
-    } 
+      return { validationErrors: { unexpected: "Unexpected error occurred" } };
+    }
   }
 };
 
@@ -45,19 +42,15 @@ const validateUpdatedBlog = async (articleData: any, res: Response): Promise<Upd
     return validatedData as UpdatedBlog;
   } catch (error) {
     if (error instanceof ZodError) {
-      console.error('Validation failed:', error.errors);
+      const validationError = error.errors[0];
+      const errorMessage = validationError.message;
 
-      const errorMessages: Record<string, string> = {};
-      error.errors.forEach((validationError) => {
-        const fieldName = validationError.path[0];
-        const errorMessage = validationError.message;
-        errorMessages[fieldName] = errorMessage;
-      });
-
+      const errorMessages: Record<string, string> = {
+        errorMessage,
+      };
       return { validationErrors: errorMessages };
     } else {
-      console.error('Unexpected error:', error);
-      return { validationErrors: { unexpected: 'Unexpected error occurred' } };
+      return { validationErrors: { unexpected: "Unexpected error occurred" } };
     }
   }
 };
