@@ -4,9 +4,9 @@ import request from "supertest";
 import bodyParser from 'body-parser';
 import path from "path";
 import morgan from "morgan";
-import userRoutes from "../scr/routes/users";
-import blogRoutes from "../scr/routes/blogs";
-import commentRoutes from "../scr/routes/comments";
+import userRoutes from "../src/routes/users";
+import blogRoutes from "../src/routes/blogs";
+import commentRoutes from "../src/routes/comments";
 
 require('dotenv').config();
 
