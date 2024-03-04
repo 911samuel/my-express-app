@@ -4,9 +4,9 @@
   "description": "my brand backend implementation",
   "main": "index.js",
   "scripts": {
-    "dev:watch": "nodemon ./scr/index.ts",
+    "dev:watch": "nodemon ./src/index.ts",
     "dev": "npm run clean && npm run build && npm run dev:watch",
-    "start": "nodemon scr/index.ts",
+    "start": "nodemon src/index.ts",
     "build": "tsc",
     "test": "cross-env NODE_ENV=test jest",
     "lint": "eslint .",
