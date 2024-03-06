@@ -13,8 +13,8 @@ import isAdmin from "../middlewares/isAdmin";
 
 const router: Router = Router();
 
-router.get("/all", authenticate, isAdmin, all);
-router.get("/single/:id", authenticate, isAdmin, single);
+router.get("/all", authenticate, all);
+router.get("/single/:id", authenticate, single);
 router.post("/create", authenticate, isAdmin, upload.single("imgUrl"), create);
 router.put(
   "/update/:id",

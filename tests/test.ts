@@ -137,20 +137,6 @@ describe("User Endpoints", () => {
     expect(res.status).toEqual(200);
   });
 
-  it( 'GET  /users/single/:id should return the requested user profile'  , async ()=>{
-     const res = await request(app)
-      .get(`/users/single/${userId}`);
-      expect(res.status).toEqual(200);
-   })
-
-  it("PUT /users/update should update a user", async () => {
-    const response = await request(app)
-      .put(`/users/update/${userId}`)
-      .send(userWithUserRole);
-
-    expect(response.status).toBe(200);
-  });
-
   it("POST /users/signIn should log in a user", async () => {
     const response = await request(app).post("/users/signIn").send({
       email: userWithAdminRole.email,
@@ -161,6 +147,21 @@ describe("User Endpoints", () => {
     expect(response.body.token).toBeTruthy();
     expect(response.body.userWithoutPassword._id).toBeTruthy();
     adminToken = response.body.token;
+  });
+
+  it( 'GET  /users/single/:id should return the requested user profile'  , async ()=>{
+     const res = await request(app)
+      .get(`/users/single/${userId}`);
+      expect(res.status).toEqual(200);
+   })
+
+  it("PUT /users/update should update a user", async () => {
+    const response = await request(app)
+      .put(`/users/update/${userId}`)
+      .set("Authorization", `Bearer ${adminToken}`)
+      .send(userWithUserRole);
+
+    expect(response.status).toBe(200);
   });
 
   it("POST /users/signIn should log in a user", async () => {
