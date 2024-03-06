@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:3000",
+      "url": "https://my-express-app-yzv8.onrender.com",
       "description": "Local server"
     }
   ],
@@ -63,9 +63,6 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
           },
           "401": {
             "description": "Unauthorized"
@@ -207,9 +204,6 @@
           "200": {
             "description": "OK"
           },
-          "400": {
-            "description": "Bad Request"
-          },
           "404": {
             "description": "Not Found"
           }
@@ -225,22 +219,16 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
           }
         }
       }
     },
     "/blogs/all": {
       "get": {
-        "tags": ["BLOG"],
-        "description": "",
-        "security": [
-          {
-            "bearerAuth": []
-          }
+        "tags": [
+          "BLOG"
         ],
+        "description": "",
         "responses": {
           "200": {
             "description": "OK"
@@ -253,13 +241,10 @@
     },
     "/blogs/single/{id}": {
       "get": {
-        "tags": ["BLOG"],
-        "description": "",
-        "security": [
-          {
-            "bearerAuth": []
-          }
+        "tags": [
+          "BLOG"
         ],
+        "description": "",
         "parameters": [
           {
             "name": "id",
@@ -282,13 +267,10 @@
     },
     "/blogs/create": {
       "post": {
-        "tags": ["BLOG"],
-        "description": "",
-        "security": [
-          {
-            "bearerAuth": []
-          }
+        "tags": [
+          "BLOG"
         ],
+        "description": "",
         "responses": {
           "201": {
             "description": "Created"
@@ -324,13 +306,10 @@
     },
     "/blogs/update/{id}": {
       "put": {
-        "tags": ["BLOG"],
-        "description": "",
-        "security": [
-          {
-            "bearerAuth": []
-          }
+        "tags": [
+          "BLOG"
         ],
+        "description": "",
         "parameters": [
           {
             "name": "id",
@@ -344,6 +323,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
           },
           "404": {
             "description": "Not Found"
@@ -376,13 +358,10 @@
     },
     "/blogs/delete/{id}": {
       "delete": {
-        "tags": ["BLOG"],
-        "description": "",
-        "security": [
-          {
-            "bearerAuth": []
-          }
+        "tags": [
+          "BLOG"
         ],
+        "description": "",
         "parameters": [
           {
             "name": "id",
@@ -405,13 +384,10 @@
     },
     "/blogs/deleteAll": {
       "delete": {
-        "tags": ["BLOG"],
-        "description": "",
-        "security": [
-          {
-            "bearerAuth": []
-          }
+        "tags": [
+          "BLOG"
         ],
+        "description": "",
         "responses": {
           "200": {
             "description": "OK"
@@ -421,13 +397,10 @@
     },
     "/comments/add/{id}": {
       "post": {
-        "tags": ["COMMENT"],
-        "description": "",
-        "security": [
-          {
-            "bearerAuth": []
-          }
+        "tags": [
+          "COMMENT"
         ],
+        "description": "",
         "parameters": [
           {
             "name": "id",
@@ -470,13 +443,10 @@
     },
     "/comments/update/{id}": {
       "put": {
-        "tags": ["COMMENT"],
-        "description": "",
-        "security": [
-          {
-            "bearerAuth": []
-          }
+        "tags": [
+          "COMMENT"
         ],
+        "description": "",
         "parameters": [
           {
             "name": "id",
@@ -519,13 +489,10 @@
     },
     "/comments/delete/{id}": {
       "delete": {
-        "tags": ["COMMENT"],
-        "description": "",
-        "security": [
-          {
-            "bearerAuth": []
-          }
+        "tags": [
+          "COMMENT"
         ],
+        "description": "",
         "parameters": [
           {
             "name": "id",
@@ -551,13 +518,10 @@
     },
     "/comments/deleteAll": {
       "delete": {
-        "tags": ["COMMENT"],
-        "description": "",
-        "security": [
-          {
-            "bearerAuth": []
-          }
+        "tags": [
+          "COMMENT"
         ],
+        "description": "",
         "responses": {
           "200": {
             "description": "OK"
