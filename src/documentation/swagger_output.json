@@ -7,8 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://my-express-app-yzv8.onrender.com",
-      "description": "Local server"
+      "url": "https://my-express-app-yzv8.onrender.com"
     }
   ],
   "paths": {
