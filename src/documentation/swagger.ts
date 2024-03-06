@@ -10,7 +10,6 @@ const apiDoc = {
   servers: [
     {
       url: "https://my-express-app-yzv8.onrender.com",
-      description: "Local server",
     },
   ],
   paths: {},
