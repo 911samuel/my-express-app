@@ -12,7 +12,6 @@ const blogsZodSchema = z.object({
 const updateBlogSchema = z.object({
   title: z.string().min(1, { message: 'Title is required' }).optional(),
   text: z.string().min(1, { message: 'Text is required' }).optional(),
-  imagePath: z.string().min(1, { message: 'Image path is required' }).optional(),  
 });
 
 interface UpdatedBlog extends IBlog {}

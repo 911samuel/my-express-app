@@ -13,7 +13,7 @@ const BlogSchema: Schema = new Schema(
     author: { type: String, required: true },
     category: { type: String, required: true },
     description: { type: String, required: true },
-    imgUrl: { type: String, required: true },
+    imgUrl: { type: String},
   },
   { timestamps: true }
 );
