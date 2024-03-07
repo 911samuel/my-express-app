@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import Blog, { IBlog } from "../models/blogs";
 import { validateBlog, validateUpdatedBlog } from "../utils/blogs";
+import upload from "../middlewares/upload";
 
 const all = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -39,10 +40,10 @@ const create = async (req: Request, res: Response, next: NextFunction) => {
 
     const { title, author, category, description } = req.body;
 
-    let imgUrl = ""; 
+    let imgUrl = "";
 
     if (req.file && req.file.path) {
-      imgUrl = req.file.path; 
+      imgUrl = req.file.path;
     }
 
     console.log(imgUrl);
@@ -73,7 +74,7 @@ const update = async (req: Request, res: Response, next: NextFunction) => {
     if ("validationErrors" in validatedUpdatedBlog) {
       return res.status(400).json(validatedUpdatedBlog);
     }
-    
+
     const updatedFields: Partial<IBlog> = {
       title: req.body.title,
       author: req.body.author,
@@ -104,6 +105,7 @@ const update = async (req: Request, res: Response, next: NextFunction) => {
     next(error);
   }
 };
+
 
 const delete1 = async (req: Request, res: Response, next: NextFunction) => {
   const blogId = req.params.id;
