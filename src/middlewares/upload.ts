@@ -1,16 +1,10 @@
 import path from 'path';
 import multer, { StorageEngine } from 'multer';
 import { Request, Express } from 'express';
-import fs from 'fs';
-
-const uploadDir = path.join(__dirname, "../uploads/");
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir);
-}
 
 const storage: StorageEngine = multer.diskStorage({
     destination: function (req: Request, file: Express.Multer.File, cb) {
-        cb(null, uploadDir); 
+        cb(null, 'uploads'); 
     },
     filename: function (req: Request, file: Express.Multer.File, cb) {
         let ext = path.extname(file.originalname);

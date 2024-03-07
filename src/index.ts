@@ -6,6 +6,7 @@ import swaggerOutPut from "./documentation/swagger_output.json";
 import cors from "cors";
 import morgan from "morgan";
 import mongoose from "mongoose";
+import fs  from 'fs';
 
 require("dotenv").config();
 
@@ -34,6 +35,11 @@ app.use(cors());
 
 app.use(bodyParser.json({ limit: "50mb" })); 
 app.use(bodyParser.urlencoded({ extended: false }));
+
+const uploadDir = path.join(__dirname, "../uploads/");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+}
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
