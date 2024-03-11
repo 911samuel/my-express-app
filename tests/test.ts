@@ -9,6 +9,8 @@ import blogRoutes from "../src/routes/blogs";
 import commentRoutes from "../src/routes/comments";
 import upload from "../src/middlewares/upload";
 import supertest from "supertest";
+import Blog from "../src/models/blogs";
+import User from "../src/models/users";
 
 require('dotenv').config();
 
@@ -55,9 +57,11 @@ interface Blog {
 }
 
 let userId: string;
+let adminId: string;
 let adminToken: string;
 let userToken: string;
 let blogId: string;
+let id: string;
 let commentId: string;
 
 const userWithUserRole: User = {
@@ -67,6 +71,15 @@ const userWithUserRole: User = {
   email: "john@example.com",
   password: "password123",
 };
+
+const userWithUserRoleError: User = {
+  firstname: "",
+  lastname: "Didier",
+  username: "",
+  email: "john@example.com",
+  password: "password123",
+};
+
 
 const userWithAdminRole: User = {
   firstname: "abayizera",
@@ -127,13 +140,41 @@ describe("User Endpoints", () => {
   it("POST /users/signUp should register a user", async () => {
     const response = await request(app)
       .post("/users/signUp")
+      .send(userWithUserRoleError);
+
+    expect(response.status).toBe(400);
+  });
+
+  it("POST /users/signUp should register a user", async () => {
+    const response = await request(app)
+      .post("/users/signUp")
       .send(userWithAdminRole);
 
     expect(response.status).toBe(200);
+    adminId = response.body.userWithoutPassword._id;
+  });
+
+  it("should return validation error when signing up with invalid data", async () => {
+    const invalidUserData = {
+      username: "invalidusername123",
+      email: "invalid@email",
+      password: "s"
+    };
+
+    const response = await request(app)
+      .post("/users/signUp")
+      .send(invalidUserData);
+
+    expect(response.status).toBe(400);
   });
 
   it('GET /user/all should get all registered users', async () => {
     const res = await request(app).get("/users/all");
+    expect(res.status).toEqual(200);
+  });
+
+  it("GET  /users/single/:id should return the requested user profile", async () => {
+    const res = await request(app).get(`/users/single/${userId}`);
     expect(res.status).toEqual(200);
   });
 
@@ -149,12 +190,31 @@ describe("User Endpoints", () => {
     adminToken = response.body.token;
   });
 
-  it( 'GET  /users/single/:id should return the requested user profile'  , async ()=>{
-     const res = await request(app)
-      .get(`/users/single/${userId}`);
-      expect(res.status).toEqual(200);
-   })
+   it("POST /users/signIn should log in a user", async () => {
+     const response = await request(app).post("/users/signIn").send({
+       email: userWithUserRole.email,
+       password: userWithUserRole.password,
+     });
 
+     expect(response.status).toBe(200);
+     expect(response.body.token).toBeTruthy();
+     expect(response.body.userWithoutPassword._id).toBeTruthy();
+     userToken = response.body.token;
+   });
+  
+  it("POST /users/signIn Invalid request", async () => {
+    const response = await request(app).post("/users/signIn").send({});
+    expect(response.status).toBe(401);
+  });
+
+  it("POST /users/signIn Invalid user", async () => {
+    const response = await request(app).post("/users/signIn").send({
+      username: "Simon@gmail.com",
+      password: "Simon",
+    });
+    expect(response.status).toBe(401);
+  });
+  
   it("PUT /users/update should update a user", async () => {
     const response = await request(app)
       .put(`/users/update/${userId}`)
@@ -164,16 +224,25 @@ describe("User Endpoints", () => {
     expect(response.status).toBe(200);
   });
 
-  it("POST /users/signIn should log in a user", async () => {
-    const response = await request(app).post("/users/signIn").send({
-      email: userWithUserRole.email,
-      password: userWithUserRole.password,
-    });
+  it("should return validation error when updating user with invalid data", async () => {
+    const invalidUserData = {
+      email: "notanemail",
+    };
 
-    expect(response.status).toBe(200);
-    expect(response.body.token).toBeTruthy();
-    expect(response.body.userWithoutPassword._id).toBeTruthy();
-    userToken = response.body.token;
+    const response = await request(app)
+      .put(`/users/update/${userId}`)
+      .set("Authorization", `Bearer ${adminToken}`)
+      .send(invalidUserData);
+
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty("validationErrors");
+  });
+});
+
+describe("Failed user", () => {
+  it("should handle error when fetching blogs", async () => {
+    const res = await request(app).get("/users/all1");
+    expect(res.status).toEqual(404);
   });
 });
 
@@ -185,6 +254,11 @@ describe("Blog Endpoints", () => {
       .send(mockBlog);
     expect(response.status).toEqual(201);
     blogId = response.body.blog._id;
+  });
+
+  it("POST /blogs/create should return 401 without token", async () => {
+    const res = await request(app).post("/blogs/create").send(mockBlog);
+    expect(res.status).toEqual(401);
   });
 
   it("GET /blogs/all should fetch all blogs", async () => {
@@ -207,6 +281,49 @@ describe("Blog Endpoints", () => {
       .set("Authorization", `Bearer ${adminToken}`)
       .send(mockUpdateBlog);
     expect(response.status).toEqual(200);
+  });
+
+  it("PUT /users/update/:id should return 401 without admin token", async () => {
+    const res = await request(app)
+      .put(`/users/update/${userId}`)
+      .send(userWithUserRole);
+    expect(res.status).toEqual(401);
+  });
+
+  it("PUT /users/update/:id should return 404 without wrong url", async () => {
+    const res = await request(app)
+      .put("/users/update")
+      .send(userWithUserRole);
+    expect(res.status).toEqual(404);
+  });
+
+  it("should return validation error when creating blog with invalid data", async () => {
+    const invalidBlogData = {
+      category: "",
+      title: "",
+    };
+
+    const response = await request(app)
+      .post("/blogs/create")
+      .set("Authorization", `Bearer ${adminToken}`)
+      .send(invalidBlogData);
+
+    expect(response.status).toBe(400);
+  });
+
+  it("should return validation error when updating blog with invalid data", async () => {
+    const invalidBlogData = {
+      title: '',
+      content: ""
+    };
+
+    const response = await request(app)
+      .put(`/blogs/update/${blogId}`)
+      .set("Authorization", `Bearer ${adminToken}`)
+      .send(invalidBlogData);
+
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty("validationErrors");
   });
 });
 

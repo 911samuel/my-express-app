@@ -1,18 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import Blog, { IBlog } from "../models/blogs";
 import { validateBlog, validateUpdatedBlog } from "../utils/blogs";
-import upload from "../middlewares/upload";
 
 const all = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const blogs = await Blog.find();
     res.json({ blogs });
   } catch (error) {
-    console.error("Error fetching blogs:", error);
-    res.status(500).json({
-      error: "An error occurred while fetching blogs",
-      details: error,
-    });
+    res.status(500).json( {error: "An error occurred while fetching blogs", details: error, });
   }
 };
 
