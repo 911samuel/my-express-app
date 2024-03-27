@@ -33,7 +33,6 @@ const add = async (req: RequestWithBlog, res: Response, next: NextFunction) => {
 
     return res.status(201).json({ message: "Comment added successfully", comment: newComment });
   } catch (error) {
-    console.error("Error adding comment:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };

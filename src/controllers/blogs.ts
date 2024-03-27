@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import Blog, { IBlog } from "../models/blogs";
 import { validateBlog, validateUpdatedBlog } from "../utils/blogs";
-import { upload } from "../middlewares/upload"; 
+import { upload, uploadToCloudinary } from "../middlewares/upload"; 
 
 const all = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -42,9 +42,13 @@ const create = async (req: Request, res: Response, next: NextFunction) => {
     let imgUrl = "";
 
     if (req.file && req.file.path) {
-      imgUrl = req.file.path;
+      const cloudinaryUrl = await uploadToCloudinary(req.file);
+      if (cloudinaryUrl instanceof Error) {
+        throw new Error("Failed to upload image to Cloudinary");
+      }
+      imgUrl = cloudinaryUrl;
     }
-
+    
     const blog: IBlog = new Blog({
       title,
       author,
@@ -80,7 +84,11 @@ const update = async (req: Request, res: Response, next: NextFunction) => {
     };
 
     if (req.file) {
-      updatedFields.imgUrl = req.file.path;
+      const cloudinaryUrl = await uploadToCloudinary(req.file);
+      if (cloudinaryUrl instanceof Error) {
+        throw new Error("Failed to upload image to Cloudinary");
+      }
+      updatedFields.imgUrl = cloudinaryUrl;
     }
 
     const updatedBlog = await Blog.findByIdAndUpdate(

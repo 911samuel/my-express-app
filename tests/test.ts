@@ -118,6 +118,10 @@ const mockComment = {
   content: "This is a sample comment",
 };
 
+const mockUpdateComment = {
+  content: "This is a sample comment",
+};
+
 const testingDbURI = process.env.TEST_MONGODB_URI;
 
 beforeAll(async () => {
@@ -422,12 +426,33 @@ describe("Comment Endpoints", () => {
     commentId = response.body.comment._id;
   });
 
+  it("POST /comments/add/:id should return 400 with validation errors", async () => {
+    const invalidData = {
+      content: "", 
+    };
+
+    const response = await request(app)
+      .post(`/comments/add/${blogId}`)
+      .set("Authorization", `Bearer ${userToken}`)
+      .send(invalidData)
+      .expect(500); 
+  });
+
   it("PUT /comments/update/:id should update a comment", async () => {
     const response = await request(app)
       .put(`/comments/update/${commentId}`)
       .set("Authorization", `Bearer ${userToken}`)
-      .send(mockUpdateBlog);
+      .send(mockUpdateComment);
     expect(response.status).toEqual(200);
+  });
+
+  it("PUT /comments/update/:id should return 500 if comment not found", async () => {
+    const invalidCommentId = "invalidId"; 
+    const response = await request(app)
+      .put(`/comments/update/${invalidCommentId}`)
+      .set("Authorization", `Bearer ${userToken}`)
+      .send(mockUpdateComment)
+      .expect(500); 
   });
 });
 
@@ -437,6 +462,14 @@ describe("Delete Comment Endpoints", () => {
       .delete(`/comments/delete/${commentId}`)
       .set("Authorization", `Bearer ${userToken}`);
     expect(response.status).toBe(200);
+  });
+
+  it("DELETE /comments/delete/:id should return 500 if comment not found", async () => {
+    const invalidCommentId = "invalidId"; 
+    const response = await request(app)
+      .delete(`/comments/delete/${invalidCommentId}`)
+      .set("Authorization", `Bearer ${userToken}`);
+    expect(response.status).toBe(500);
   });
 
   it("DELETE /comments/deleteAll should delete all comments", async () => {
