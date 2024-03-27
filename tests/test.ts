@@ -1,27 +1,27 @@
 import express, { Request, Response, NextFunction } from "express";
 import mongoose from "mongoose";
 import request from "supertest";
-import bodyParser from 'body-parser';
+import bodyParser from "body-parser";
 import path from "path";
 import morgan from "morgan";
 import userRoutes from "../src/routes/users";
 import blogRoutes from "../src/routes/blogs";
 import commentRoutes from "../src/routes/comments";
-import upload from "../src/middlewares/upload";
+import { upload, uploadToCloudinary } from "../src/middlewares/upload";
 import supertest from "supertest";
 import Blog from "../src/models/blogs";
 import User from "../src/models/users";
 
-require('dotenv').config();
+require("dotenv").config();
 
 const app = express();
 
 app.use(morgan("dev"));
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true })); 
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use("/users", userRoutes);
 app.use("/blogs", blogRoutes);
@@ -32,13 +32,22 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(500).send(`Something went wrong! Error: ${err.message}`);
 });
 
-app.post(
-  "/upload",
-  upload.single("file"),
-  (req: Request, res: Response) => {
-    res.status(200).json({ message: "File uploaded successfully" });
+app.post("/upload", upload, async (req: Request, res: Response) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const cloudinaryUrl = await uploadToCloudinary(req.file);
+
+    res
+      .status(200)
+      .json({ message: "File uploaded successfully", cloudinaryUrl });
+  } catch (error) {
+    console.error("Error handling file upload:", error);
+    res.status(500).json({ message: "File upload failed", error: error });
   }
-);
+});
 
 interface User {
   firstname: string;
@@ -80,7 +89,6 @@ const userWithUserRoleError: User = {
   password: "password123",
 };
 
-
 const userWithAdminRole: User = {
   firstname: "abayizera",
   lastname: "samuel",
@@ -94,14 +102,16 @@ const mockBlog: Blog = {
   author: "John Doe",
   category: "Technology",
   description: "This is a sample blog description",
-  imgUrl: "/home/sam/Pictures/Screenshots/Screenshot from 2024-02-23 00-00-41.png",
+  imgUrl:
+    "/home/sam/Pictures/Screenshots/Screenshot from 2024-02-23 00-00-41.png",
 };
 
 const mockUpdateBlog: Partial<Blog> = {
   title: "Updated Sample Blog jugumilajhwdga",
   category: "Science",
   description: "This is the updated sample blog description",
-  imgUrl: "/home/sam/Pictures/Screenshots/Screenshot from 2024-02-23 15-57-48.png",
+  imgUrl:
+    "/home/sam/Pictures/Screenshots/Screenshot from 2024-02-23 15-57-48.png",
 };
 
 const mockComment = {
@@ -114,7 +124,6 @@ beforeAll(async () => {
   if (testingDbURI) {
     try {
       await mongoose.connect(testingDbURI);
-      console.log("Connected to MongoDB");
     } catch (error) {
       console.error("Error connecting to MongoDB:", error);
     }
@@ -128,37 +137,22 @@ afterAll(async () => {
 });
 
 describe("User Endpoints", () => {
-  it("POST /users/signUp should register a user", async () => {
+  it("should register a user with valid data", async () => {
     const response = await request(app)
       .post("/users/signUp")
       .send(userWithUserRole);
 
     expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty("token");
+    expect(response.body).toHaveProperty("userWithoutPassword");
     userId = response.body.userWithoutPassword._id;
   });
 
-  it("POST /users/signUp should register a user", async () => {
-    const response = await request(app)
-      .post("/users/signUp")
-      .send(userWithUserRoleError);
-
-    expect(response.status).toBe(400);
-  });
-
-  it("POST /users/signUp should register a user", async () => {
-    const response = await request(app)
-      .post("/users/signUp")
-      .send(userWithAdminRole);
-
-    expect(response.status).toBe(200);
-    adminId = response.body.userWithoutPassword._id;
-  });
-
-  it("should return validation error when signing up with invalid data", async () => {
+  it("should return validation error when registering with invalid data", async () => {
     const invalidUserData = {
       username: "invalidusername123",
       email: "invalid@email",
-      password: "s"
+      password: "s",
     };
 
     const response = await request(app)
@@ -166,9 +160,33 @@ describe("User Endpoints", () => {
       .send(invalidUserData);
 
     expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty("errorMessage", "Required");
   });
 
-  it('GET /user/all should get all registered users', async () => {
+  it("should return error when registering with existing username", async () => {
+    const response = await request(app)
+      .post("/users/signUp")
+      .send(userWithUserRole);
+
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty(
+      "message",
+      "Username is already taken"
+    );
+  });
+
+  it("should register an admin user", async () => {
+    const response = await request(app)
+      .post("/users/signUp")
+      .send(userWithAdminRole);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty("token");
+    expect(response.body).toHaveProperty("userWithoutPassword");
+    adminId = response.body.userWithoutPassword._id;
+  });
+
+  it("GET /user/all should get all registered users", async () => {
     const res = await request(app).get("/users/all");
     expect(res.status).toEqual(200);
   });
@@ -190,18 +208,18 @@ describe("User Endpoints", () => {
     adminToken = response.body.token;
   });
 
-   it("POST /users/signIn should log in a user", async () => {
-     const response = await request(app).post("/users/signIn").send({
-       email: userWithUserRole.email,
-       password: userWithUserRole.password,
-     });
+  it("POST /users/signIn should log in a user", async () => {
+    const response = await request(app).post("/users/signIn").send({
+      email: userWithUserRole.email,
+      password: userWithUserRole.password,
+    });
 
-     expect(response.status).toBe(200);
-     expect(response.body.token).toBeTruthy();
-     expect(response.body.userWithoutPassword._id).toBeTruthy();
-     userToken = response.body.token;
-   });
-  
+    expect(response.status).toBe(200);
+    expect(response.body.token).toBeTruthy();
+    expect(response.body.userWithoutPassword._id).toBeTruthy();
+    userToken = response.body.token;
+  });
+
   it("POST /users/signIn Invalid request", async () => {
     const response = await request(app).post("/users/signIn").send({});
     expect(response.status).toBe(401);
@@ -214,7 +232,7 @@ describe("User Endpoints", () => {
     });
     expect(response.status).toBe(401);
   });
-  
+
   it("PUT /users/update should update a user", async () => {
     const response = await request(app)
       .put(`/users/update/${userId}`)
@@ -268,11 +286,42 @@ describe("Blog Endpoints", () => {
     expect(response.status).toEqual(200);
   });
 
+  it("GET /blogs/all should handle errors when fetching blogs", async () => {
+    jest.spyOn(Blog, "find").mockRejectedValue(new Error("Database error"));
+
+    const response = await request(app)
+      .get("/blogs/all")
+      .set("Authorization", `Bearer ${adminToken}`);
+
+    expect(response.status).toBe(500);
+    expect(response.body).toHaveProperty(
+      "error",
+      "An error occurred while fetching blogs"
+    );
+  });
+
   it("GET /blogs/single/:id should fetch a single blog", async () => {
     const response = await request(app)
       .get(`/blogs/single/${blogId}`)
       .set("Authorization", `Bearer ${adminToken}`);
     expect(response.status).toEqual(200);
+  });
+
+  it("GET /blogs/single/:id should handle case when an error occurs", async () => {
+    jest.spyOn(Blog, "findById").mockImplementationOnce(() => {
+      throw new Error("Test error");
+    });
+
+    const existingId = "existing-id";
+    const response = await request(app)
+      .get(`/blogs/single/${existingId}`)
+      .set("Authorization", `Bearer ${adminToken}`);
+
+    expect(response.status).toBe(500);
+    expect(response.body).toHaveProperty(
+      "error",
+      "An error occurred while fetching the blog"
+    );
   });
 
   it("PUT /blogs/update/:id should update a blog", async () => {
@@ -291,9 +340,7 @@ describe("Blog Endpoints", () => {
   });
 
   it("PUT /users/update/:id should return 404 without wrong url", async () => {
-    const res = await request(app)
-      .put("/users/update")
-      .send(userWithUserRole);
+    const res = await request(app).put("/users/update").send(userWithUserRole);
     expect(res.status).toEqual(404);
   });
 
@@ -313,8 +360,8 @@ describe("Blog Endpoints", () => {
 
   it("should return validation error when updating blog with invalid data", async () => {
     const invalidBlogData = {
-      title: '',
-      content: ""
+      title: "",
+      content: "",
     };
 
     const response = await request(app)
@@ -323,17 +370,45 @@ describe("Blog Endpoints", () => {
       .send(invalidBlogData);
 
     expect(response.status).toBe(400);
-    expect(response.body).toHaveProperty("validationErrors");
+    expect(response.body).toHaveProperty("errorMessage");
+    expect(response.body.errorMessage).toBe("Title is required");
+  });
+
+  it("should return validation error when creating blog with invalid data", async () => {
+    const invalidBlogData = {
+      category: "",
+      title: "",
+    };
+
+    const response = await request(app)
+      .post("/blogs/create")
+      .set("Authorization", `Bearer ${adminToken}`)
+      .send(invalidBlogData);
+
+    expect(response.status).toBe(400);
+  });
+
+  it("should return validation error when updating blog with invalid data", async () => {
+    const invalidBlogData = {
+      title: "",
+      content: "",
+    };
+
+    const response = await request(app)
+      .put(`/blogs/update/${blogId}`)
+      .set("Authorization", `Bearer ${adminToken}`)
+      .send(invalidBlogData);
+
+    expect(response.status).toBe(400);
   });
 });
 
 describe("UPLOADS endponts", () => {
-  it('should upload a file successfully', async () => {
-    const response = await supertest(app)
-      .post("/upload")
+  it("should handle no file uploaded", async () => {
+    const response = await request(app).post("/upload");
 
-    expect(response.status).toBe(200);
-    expect(response.body.message).toBe('File uploaded successfully');
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty("message", "No file uploaded");
   });
 });
 

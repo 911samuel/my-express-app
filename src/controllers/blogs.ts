@@ -1,13 +1,15 @@
 import { Request, Response, NextFunction } from "express";
 import Blog, { IBlog } from "../models/blogs";
 import { validateBlog, validateUpdatedBlog } from "../utils/blogs";
+import { upload } from "../middlewares/upload"; 
 
 const all = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const blogs = await Blog.find();
     res.json({ blogs });
   } catch (error) {
-    res.status(500).json( {error: "An error occurred while fetching blogs", details: error, });
+    console.error("Error fetching blogs:", error);
+    res.status(500).json({ error: "An error occurred while fetching blogs" });
   }
 };
 
@@ -16,12 +18,14 @@ const single = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const blog = await Blog.findById(id);
     if (!blog) {
-      return res.status(404).json({ message: "Blog not found" });
+      return res.status(500).json({ message: "Blog not found" });
     }
     res.json({ blog });
   } catch (error) {
     console.error("Error fetching blog:", error);
-    next(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching the blog" });
   }
 };
 
@@ -41,8 +45,6 @@ const create = async (req: Request, res: Response, next: NextFunction) => {
       imgUrl = req.file.path;
     }
 
-    console.log(imgUrl);
-
     const blog: IBlog = new Blog({
       title,
       author,
@@ -57,7 +59,7 @@ const create = async (req: Request, res: Response, next: NextFunction) => {
       .json({ message: "The blog was added successfully", blog: savedBlog });
   } catch (error) {
     console.error("Error saving blog:", error);
-    next(error);
+    res.status(500).json({ error: "An error occurred while saving the blog" });
   }
 };
 
@@ -67,7 +69,7 @@ const update = async (req: Request, res: Response, next: NextFunction) => {
     const validatedUpdatedBlog = await validateUpdatedBlog(req.body, res);
 
     if ("validationErrors" in validatedUpdatedBlog) {
-      return res.status(400).json(validatedUpdatedBlog);
+      return res.status(400).json(validatedUpdatedBlog.validationErrors);
     }
 
     const updatedFields: Partial<IBlog> = {
@@ -91,16 +93,16 @@ const update = async (req: Request, res: Response, next: NextFunction) => {
       return res.status(404).json({ message: "Blog not found." });
     }
 
-    res.status(200).json({
-      message: "Blog updated successfully.",
-      data: updatedBlog,
-    });
+    res
+      .status(200)
+      .json({ message: "Blog updated successfully.", data: updatedBlog });
   } catch (error) {
     console.error("Error updating blog:", error);
-    next(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while updating the blog" });
   }
 };
-
 
 const delete1 = async (req: Request, res: Response, next: NextFunction) => {
   const blogId = req.params.id;
@@ -109,20 +111,24 @@ const delete1 = async (req: Request, res: Response, next: NextFunction) => {
     if (!deletedBlog) {
       return res.status(404).json({ message: "Blog not found." });
     }
-    res.status(200).json({ message: `The blog was deleted successfully.` });
+    res.status(200).json({ message: "The blog was deleted successfully." });
   } catch (error) {
     console.error("Error deleting blog:", error);
-    next(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while deleting the blog" });
   }
 };
 
 const deleteAll = async (req: Request, res: Response, next: NextFunction) => {
   try {
     await Blog.deleteMany({});
-    res.status(200).json({ message: `All blogs were deleted successfully.` });
+    res.status(200).json({ message: "All blogs were deleted successfully." });
   } catch (error) {
     console.error("Error deleting all blogs:", error);
-    next(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while deleting all blogs" });
   }
 };
 
