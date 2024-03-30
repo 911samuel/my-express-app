@@ -33,3 +33,9 @@ jobs:
         run: npm test -- --coverage
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
+      - name: Log Cloudinary Credentials
+        run: |
+          echo "Cloudinary Credentials:"
+          echo "CLOUDINARY_NAME: $CLOUDINARY_NAME"
+          echo "API_KEY: $API_KEY"
+          echo "API_SECRET: $API_SECRET"
