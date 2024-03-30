@@ -7,8 +7,6 @@ import morgan from "morgan";
 import userRoutes from "../src/routes/users";
 import blogRoutes from "../src/routes/blogs";
 import commentRoutes from "../src/routes/comments";
-import { upload, uploadToCloudinary } from "../src/middlewares/upload";
-import supertest from "supertest";
 import fs from "fs";
 import Blog from "../src/models/blogs";
 import User from "../src/models/users";
@@ -21,8 +19,6 @@ app.use(morgan("dev"));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use("/users", userRoutes);
 app.use("/blogs", blogRoutes);
