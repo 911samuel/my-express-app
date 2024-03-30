@@ -27,15 +27,16 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-      - name: Install dependencies
-        run: npm install
-      - name: Run tests with coverage
-        run: npm test -- --coverage
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
       - name: Log Cloudinary Credentials
         run: |
           echo "Cloudinary Credentials:"
           echo "CLOUDINARY_NAME: $CLOUDINARY_NAME"
           echo "API_KEY: $API_KEY"
           echo "API_SECRET: $API_SECRET"
+      - name: Install dependencies
+        run: npm install
+      - name: Run tests with coverage
+        run: npm test -- --coverage
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+     
