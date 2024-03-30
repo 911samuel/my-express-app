@@ -27,6 +27,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
+      - name: Debug Cloudinary Credentials
+        run: |
+          echo "CLOUDINARY_NAME: ${{ secrets.CLOUDINARY_NAME }}"
+          echo "API_KEY: ${{ secrets.API_KEY }}"
+          echo "API_SECRET: ${{ secrets.API_SECRET }}"
       - name: Install dependencies
         run: npm install
       - name: Run tests with coverage
