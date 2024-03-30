@@ -14,9 +14,9 @@ jobs:
       MYBRAND_MONGODB_URI: ${{ secrets.MYBRAND_MONGODB_URI }}
       TEST_MONGODB_URI: ${{ secrets.TEST_MONGODB_URI }}
       LOGIN_SECRET: ${{ secrets.LOGIN_SECRET }}
-      CLOUDINARY_NAME: ${{ secrets.CLOUDINARY_NAME }}
-      API_KEY: ${{ secrets.API_KEY }}
-      API_SECRET: ${{ secrets.API_SECRET }}
+      cloud_name: ${{ secrets.CLOUDINARY_NAME }}
+      api_key: ${{ secrets.API_KEY }}
+      api_secret: ${{ secrets.API_SECRET }}
     strategy:
       matrix:
         node-version: [ 18.x ]
@@ -33,3 +33,4 @@ jobs:
         run: npm test -- --coverage
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
+     
