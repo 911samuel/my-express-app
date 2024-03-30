@@ -9,6 +9,7 @@ import blogRoutes from "../src/routes/blogs";
 import commentRoutes from "../src/routes/comments";
 import { upload, uploadToCloudinary } from "../src/middlewares/upload";
 import supertest from "supertest";
+import fs from "fs";
 import Blog from "../src/models/blogs";
 import User from "../src/models/users";
 
@@ -32,22 +33,6 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(500).send(`Something went wrong! Error: ${err.message}`);
 });
 
-app.post("/upload", upload, async (req: Request, res: Response) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
-    }
-
-    const cloudinaryUrl = await uploadToCloudinary(req.file);
-
-    res
-      .status(200)
-      .json({ message: "File uploaded successfully", cloudinaryUrl });
-  } catch (error) {
-    console.error("Error handling file upload:", error);
-    res.status(500).json({ message: "File upload failed", error: error });
-  }
-});
 
 interface User {
   firstname: string;
@@ -102,8 +87,7 @@ const mockBlog: Blog = {
   author: "John Doe",
   category: "Technology",
   description: "This is a sample blog description",
-  imgUrl:
-    "/home/sam/Pictures/Screenshots/Screenshot from 2024-02-23 00-00-41.png",
+  imgUrl: '',
 };
 
 const mockUpdateBlog: Partial<Blog> = {
@@ -270,13 +254,23 @@ describe("Failed user", () => {
 
 describe("Blog Endpoints", () => {
   it("POST /blogs/create should create new blog", async () => {
+    const filePath = path.join(__dirname, "36ia6lcrj85.png");
+    if (!fs.existsSync(filePath)) {
+      throw new Error("Test file not found");
+    }
+
     const response = await request(app)
       .post("/blogs/create")
       .set("Authorization", `Bearer ${adminToken}`)
-      .send(mockBlog);
+      .field("imgUrl", fs.createReadStream(filePath))
+      .field("title", mockBlog.title)
+      .field("description", mockBlog.description)
+      .field("author", mockBlog.author)
+      .field("category", mockBlog.category);
     expect(response.status).toEqual(201);
     blogId = response.body.blog._id;
   });
+
 
   it("POST /blogs/create should return 401 without token", async () => {
     const res = await request(app).post("/blogs/create").send(mockBlog);
@@ -365,7 +359,7 @@ describe("Blog Endpoints", () => {
   it("should return validation error when updating blog with invalid data", async () => {
     const invalidBlogData = {
       title: "",
-      content: "",
+      description: "",
     };
 
     const response = await request(app)
@@ -404,15 +398,6 @@ describe("Blog Endpoints", () => {
       .send(invalidBlogData);
 
     expect(response.status).toBe(400);
-  });
-});
-
-describe("UPLOADS endponts", () => {
-  it("should handle no file uploaded", async () => {
-    const response = await request(app).post("/upload");
-
-    expect(response.status).toBe(400);
-    expect(response.body).toHaveProperty("message", "No file uploaded");
   });
 });
 
