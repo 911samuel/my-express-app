@@ -17,19 +17,14 @@ const isUser = async (req: RequestWithUser, res: Response, next: NextFunction) =
 
     try {
         const decoded: any = jwt.verify(token, process.env.LOGIN_SECRET || 'I0H1A9G2sam');
-
         const user = await User.findById(decoded._id);
-
         if (!user) {
             return res.status(401).json({ message: 'User not found' });
         }
-
         if (user.role !== 'user') {
             return res.status(403).json({ message: 'Unauthorized: User is not a regular user' });
         }
-
         req.user = user;
-
         next();
     } catch (error) {
         console.error("Error in isUser middleware:", error);

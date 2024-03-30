@@ -11,7 +11,6 @@ cloudinary.config({
 
 const storage: StorageEngine = multer.diskStorage({
   destination: function (req: Request, file: Express.Multer.File, cb) {
-    console.log("Upload destination:", path.join(__dirname, "uploads"));
     cb(null, "uploads");
   },
   filename: function (req: Request, file: Express.Multer.File, cb) {
@@ -42,13 +41,8 @@ const uploadToCloudinary = async (
 ): Promise<string | Error> => {
   try {
     const result = await cloudinary.uploader.upload(file.path);
-    console.log(
-      "Image uploaded to Cloudinary successfully:",
-      result.secure_url
-    );
     return result.secure_url;
   } catch (error) {
-    console.error("Error uploading image to Cloudinary:", error);
     throw new Error("Cloudinary upload failed");
   }
 };
